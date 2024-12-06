@@ -1,7 +1,7 @@
 <template>
   <section class="relative">
     <!-- Hero Section -->
-    <div class="relative min-h-screen flex items-center bg-gradient-to-br from-slate-50 to-emerald-50">
+    <div class="relative pt-10 min-h-screen flex items-center bg-gradient-to-br from-slate-50 to-emerald-50">
       <!-- Background Pattern -->
       <div class="absolute inset-0 z-0">
         <div class="absolute inset-0 bg-[url('/patterns/grid.svg')] opacity-5"></div>
