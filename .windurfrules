@@ -48,7 +48,20 @@
    - Utilize Nuxt modules when available
    - Follow Nuxt.js directory structure
 
-2. Code Style
+2. Icon Usage
+   - Use Nuxt Icon component for all icons
+   - Follow the i- prefix pattern (e.g., i-uil-github)
+   - Install required icon collections using bun add @iconify-json/{collection}
+   - Current icon collections:
+     * @iconify-json/uil (Unicons Line)
+   - Icon component usage:
+     ```vue
+     <Icon name="i-uil-github" class="w-5 h-5" />
+     ```
+   - Keep icon sizes consistent within similar contexts
+   - Use appropriate icon colors through text-{color} utility classes
+
+3. Code Style
    - Use composition API
    - Implement TypeScript for type safety
    - don't use any type
@@ -57,19 +70,19 @@
    - Write clean, documented code
    - Use meaningful variable names
 
-3. Tailwind CSS
+4. Tailwind CSS
    - Use utility classes
    - Create custom components for repeated styles
    - Maintain consistent spacing
    - Follow mobile-first approach
 
-4. Performance
+5. Performance
    - Optimize images
    - Implement lazy loading
    - Use efficient Supabase queries
    - Monitor and optimize bundle size
 
-5. SEO
+6. SEO
    - Implement meta tags
    - Use semantic HTML
    - Optimize for search engines
