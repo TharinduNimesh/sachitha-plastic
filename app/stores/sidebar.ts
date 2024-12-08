@@ -13,31 +13,24 @@ export const useSidebarStore = defineStore('sidebar', {
 
   getters: {
     sidebarWidth: (state): string => {
-      if (state.isMobileOpen) return 'w-64'
-      return state.isCollapsed ? 'w-20' : 'w-64'
+      return state.isCollapsed ? 'w-24' : 'w-64'
     },
-    mainContentMargin: (state): string => {
-      // SSR check
-      if (import.meta.server) return 'ml-64' // Default to desktop expanded view
-      
-      // Mobile: no margin
-      if (window.innerWidth < 768) {
-        console.log("Inner width:" + window.innerWidth)
-        return 'ml-0'
-      }
-      
-      // Desktop: margin based on collapsed state
-      return state.isCollapsed ? 'ml-20' : 'ml-64'
-    }
   },
 
   actions: {
     toggleCollapse() {
-      this.isCollapsed = !this.isCollapsed
+      if (process.client && window.innerWidth >= 768) {
+        this.isCollapsed = !this.isCollapsed
+        // Store the state in localStorage
+        localStorage.setItem('sidebarCollapsed', String(this.isCollapsed))
+      }
     },
     
     setCollapsed(value: boolean) {
       this.isCollapsed = value
+      if (process.client) {
+        localStorage.setItem('sidebarCollapsed', String(value))
+      }
     },
 
     toggleMobileMenu() {
@@ -46,6 +39,19 @@ export const useSidebarStore = defineStore('sidebar', {
 
     closeMobileMenu() {
       this.isMobileOpen = false
+    },
+
+    initializeState() {
+      if (process.client) {
+        // Restore collapsed state from localStorage
+        const savedState = localStorage.getItem('sidebarCollapsed')
+        if (savedState !== null) {
+          this.isCollapsed = savedState === 'true'
+        }
+
+        // Set initial mobile state
+        this.isMobileOpen = false
+      }
     }
   }
 })

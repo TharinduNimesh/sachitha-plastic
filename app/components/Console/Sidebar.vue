@@ -2,15 +2,17 @@
   <div>
     <aside
       :class="[
-        'left-0 top-0 h-screen bg-white border-r border-slate-200 flex flex-col z-30 transition-all duration-300',
+        'fixed left-0 top-0 h-screen bg-white border-r border-slate-200 flex flex-col z-30 transition-all duration-300',
         'md:fixed',
         sidebarStore.sidebarWidth,
-        !sidebarStore.isMobileOpen && 'md:w-auto',
-        !sidebarStore.isMobileOpen && 'w-0',
+        { '-translate-x-full': !sidebarStore.isMobileOpen && isMobile },
+        { 'translate-x-0': sidebarStore.isMobileOpen || !isMobile }
       ]"
     >
       <!-- Logo Section -->
-      <div class="p-6 border-b border-slate-200">
+      <div
+        class="p-6 border-b border-slate-200 overflow-hidden whitespace-nowrap"
+      >
         <div
           class="flex items-center"
           :class="{ 'justify-center': sidebarStore.isCollapsed }"
@@ -24,42 +26,54 @@
       </div>
 
       <!-- Navigation -->
-      <nav class="flex-1 overflow-y-auto p-4">
-        <div class="space-y-1">
+      <nav class="flex-1 overflow-y-auto overflow-x-hidden">
+        <ul class="p-4 space-y-2">
           <!-- Main Navigation -->
-          <NuxtLink
-            v-for="link in mainNavLinks"
-            :key="link.path"
-            :to="link.path"
-            class="flex items-center px-4 py-2.5 rounded-lg text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors duration-200 group"
-            :class="[
-              { 'bg-emerald-50 text-emerald-600': link.active },
-              { 'justify-center': sidebarStore.isCollapsed },
-            ]"
-          >
-            <Icon :name="link.icon" class="w-5 h-5" />
-            <span v-if="!sidebarStore.isCollapsed" class="ml-3">{{
-              link.name
-            }}</span>
-            <span
-              v-if="link.badge && !sidebarStore.isCollapsed"
-              class="ml-auto bg-emerald-100 text-emerald-600 text-xs font-medium px-2 py-0.5 rounded-full"
-              >{{ link.badge }}</span
+          <li v-for="link in mainNavLinks" :key="link.path">
+            <NuxtLink
+              :class="{
+                'justify-center': sidebarStore.isCollapsed,
+                'bg-emerald-50 text-emerald-600': isLinkActive(link.path),
+              }"
+              :to="link.path"
+              class="flex items-center px-4 py-3 text-slate-600 rounded-xl hover:bg-emerald-50 hover:text-emerald-600 group transition-colors duration-200"
             >
-            <!-- Tooltip for collapsed state -->
-            <div
-              v-if="sidebarStore.isCollapsed"
-              class="absolute left-full ml-6 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-sm rounded whitespace-nowrap"
-            >
-              {{ link.name }}
-              <span
-                v-if="link.badge"
-                class="ml-2 bg-emerald-500 px-1.5 py-0.5 rounded-full text-xs"
+              <div class="relative flex items-center">
+                <Icon
+                  :name="link.icon"
+                  class="w-5 h-5"
+                  :class="{ 'text-emerald-600': isLinkActive(link.path) }"
+                />
+                <span
+                  v-if="!sidebarStore.isCollapsed"
+                  class="ml-3 text-sm font-medium whitespace-nowrap"
+                  :class="{ 'text-emerald-600': isLinkActive(link.path) }"
+                >
+                  {{ link.name }}
+                </span>
+                <span
+                  v-if="link.badge && !sidebarStore.isCollapsed"
+                  class="ml-auto bg-emerald-100 text-emerald-600 text-xs font-medium px-2 py-0.5 rounded-full"
+                >
+                  {{ link.badge }}
+                </span>
+              </div>
+
+              <!-- Tooltip for collapsed state -->
+              <div
+                v-if="sidebarStore.isCollapsed"
+                class="absolute left-full ml-6 px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap"
               >
-                {{ link.badge }}
-              </span>
-            </div>
-          </NuxtLink>
+                {{ link.name }}
+                <span
+                  v-if="link.badge"
+                  class="ml-2 bg-emerald-500 px-1.5 py-0.5 rounded-full text-xs"
+                >
+                  {{ link.badge }}
+                </span>
+              </div>
+            </NuxtLink>
+          </li>
 
           <!-- Other Links -->
           <div class="pt-4 mt-4 border-t border-slate-200">
@@ -69,25 +83,39 @@
             >
               Other
             </h3>
-            <NuxtLink
-              v-for="link in otherLinks"
-              :key="link.path"
-              :to="link.path"
-              class="flex items-center px-4 py-2.5 rounded-lg text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors duration-200 group"
-              :class="{ 'justify-center': sidebarStore.isCollapsed }"
-            >
-              <Icon :name="link.icon" class="w-5 h-5" />
-              <span v-if="!sidebarStore.isCollapsed" class="ml-3">{{
-                link.name
-              }}</span>
-              <!-- Tooltip for collapsed state -->
-              <div
-                v-if="sidebarStore.isCollapsed"
-                class="absolute left-full ml-6 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-sm rounded whitespace-nowrap"
+            <li v-for="link in otherLinks" :key="link.path">
+              <NuxtLink
+                :to="link.path"
+                class="flex items-center px-4 py-3 text-slate-600 rounded-xl hover:bg-emerald-50 hover:text-emerald-600 group transition-colors duration-200"
+                :class="{
+                  'justify-center': sidebarStore.isCollapsed,
+                  'bg-emerald-50 text-emerald-600': isLinkActive(link.path),
+                }"
               >
-                {{ link.name }}
-              </div>
-            </NuxtLink>
+                <div class="relative flex items-center">
+                  <Icon
+                    :name="link.icon"
+                    class="w-5 h-5"
+                    :class="{ 'text-emerald-600': isLinkActive(link.path) }"
+                  />
+                  <span
+                    v-if="!sidebarStore.isCollapsed"
+                    class="ml-3 text-sm font-medium whitespace-nowrap"
+                    :class="{ 'text-emerald-600': isLinkActive(link.path) }"
+                  >
+                    {{ link.name }}
+                  </span>
+                </div>
+
+                <!-- Tooltip for collapsed state -->
+                <div
+                  v-if="sidebarStore.isCollapsed"
+                  class="absolute left-full ml-6 px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap"
+                >
+                  {{ link.name }}
+                </div>
+              </NuxtLink>
+            </li>
           </div>
 
           <!-- Account Links -->
@@ -98,33 +126,49 @@
             >
               Account
             </h3>
-            <NuxtLink
-              v-for="link in accountLinks"
-              :key="link.path"
-              :to="link.path"
-              class="flex items-center px-4 py-2.5 rounded-lg text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors duration-200 group"
-              :class="{ 'justify-center': sidebarStore.isCollapsed }"
-            >
-              <Icon :name="link.icon" class="w-5 h-5" />
-              <span v-if="!sidebarStore.isCollapsed" class="ml-3">{{
-                link.name
-              }}</span>
-              <!-- Tooltip for collapsed state -->
-              <div
-                v-if="sidebarStore.isCollapsed"
-                class="absolute left-full ml-6 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-sm rounded whitespace-nowrap"
+            <li v-for="link in accountLinks" :key="link.path">
+              <NuxtLink
+                :to="link.path"
+                class="flex items-center px-4 py-3 text-slate-600 rounded-xl hover:bg-emerald-50 hover:text-emerald-600 group transition-colors duration-200"
+                :class="{
+                  'justify-center': sidebarStore.isCollapsed,
+                  'bg-emerald-50 text-emerald-600': isLinkActive(link.path),
+                }"
               >
-                {{ link.name }}
-              </div>
-            </NuxtLink>
+                <div class="relative flex items-center">
+                  <Icon
+                    :name="link.icon"
+                    class="w-5 h-5"
+                    :class="{ 'text-emerald-600': isLinkActive(link.path) }"
+                  />
+                  <span
+                    v-if="!sidebarStore.isCollapsed"
+                    class="ml-3 text-sm font-medium whitespace-nowrap"
+                    :class="{ 'text-emerald-600': isLinkActive(link.path) }"
+                  >
+                    {{ link.name }}
+                  </span>
+                </div>
+
+                <!-- Tooltip for collapsed state -->
+                <div
+                  v-if="sidebarStore.isCollapsed"
+                  class="absolute left-full ml-6 px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap"
+                >
+                  {{ link.name }}
+                </div>
+              </NuxtLink>
+            </li>
           </div>
-        </div>
+        </ul>
       </nav>
 
       <!-- User Profile -->
-      <div class="p-4 border-t border-slate-200">
+      <div
+        class="p-4 border-t border-slate-200 overflow-hidden whitespace-nowrap"
+      >
         <div
-          class="flex items-center px-4 py-2.5 rounded-lg bg-slate-50"
+          class="flex items-center px-4 py-2.5 rounded-xl bg-slate-50"
           :class="{ 'justify-center': sidebarStore.isCollapsed }"
         >
           <img
@@ -140,7 +184,7 @@
           </div>
           <button
             v-if="!sidebarStore.isCollapsed"
-            class="p-1 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors duration-200"
+            class="ml-auto p-1 text-slate-400 hover:text-slate-500 rounded-lg hover:bg-slate-100 transition-colors duration-200"
           >
             <Icon name="i-uil-signout" class="w-5 h-5" />
           </button>
@@ -154,9 +198,7 @@
       >
         <Icon
           :name="
-            sidebarStore.isCollapsed
-              ? 'i-uil-angle-right'
-              : 'i-uil-angle-left'
+            sidebarStore.isCollapsed ? 'i-uil-angle-right' : 'i-uil-angle-left'
           "
           class="w-4 h-4"
         />
@@ -169,75 +211,86 @@
       class="fixed inset-0 bg-slate-900/50 z-20 md:hidden"
       @click="sidebarStore.closeMobileMenu"
     ></div>
-
-    <!-- Mobile Toggle Button -->
-    <button
-      @click="sidebarStore.toggleMobileMenu"
-      class="md:hidden fixed z-30 bottom-6 right-6 bg-emerald-600 text-white p-3 rounded-full shadow-lg hover:bg-emerald-700 transition-colors"
-    >
-      <Icon
-        :name="sidebarStore.isMobileOpen ? 'i-uil-times' : 'i-uil-bars'"
-        class="w-6 h-6"
-      />
-    </button>
   </div>
 </template>
 
+<style scoped>
+/* Hide scrollbar but allow scrolling */
+nav {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+nav::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Ensure smooth transitions */
+.translate-x-[\-100\%] {
+  transform: translateX(-100%);
+}
+</style>
+
 <script setup>
-import { useSidebarStore } from "~/stores/sidebar";
-
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { debounce } from 'lodash';
 const sidebarStore = useSidebarStore();
+const route = useRoute();
 
+const isMobile = ref(false);
+const isClient = computed(() => process.client);
+
+onMounted(() => {
+  if (isClient.value) {
+    checkMobileView();
+    window.addEventListener('resize', handleResize);
+  }
+});
+
+const checkMobileView = () => {
+  if (isClient.value) {
+    isMobile.value = window.innerWidth < 768;
+  }
+};
+
+const handleResize = debounce(() => {
+  if (isClient.value) {
+    checkMobileView();
+  }
+}, 200);
+
+onUnmounted(() => {
+  if (isClient.value) {
+    window.removeEventListener('resize', handleResize);
+  }
+});
+
+// Navigation Links
 const mainNavLinks = [
   {
     name: "Dashboard",
     path: "/console",
-    active: true,
     icon: "i-uil-apps",
   },
   {
     name: "Products",
     path: "/console/products",
     icon: "i-uil-box",
+    badge: "24",
   },
   {
-    name: "Orders",
-    path: "/console/orders",
-    icon: "i-uil-shopping-cart",
-  },
-  {
-    name: "Customers",
-    path: "/console/customers",
-    icon: "i-uil-users-alt",
-  },
-  {
-    name: "Chat",
-    path: "/console/chat",
-    icon: "i-uil-comment-alt",
-    badge: "22",
+    name: "Categories",
+    path: "/console/categories",
+    icon: "i-uil-layer-group",
   },
 ];
 
 const otherLinks = [
   {
-    name: "Email",
-    path: "/console/email",
-    icon: "i-uil-envelope",
-  },
-  {
-    name: "Analytics",
-    path: "/console/analytics",
-    icon: "i-uil-chart",
-  },
-  {
-    name: "Integration",
-    path: "/console/integration",
-    icon: "i-uil-puzzle-piece",
-  },
-  {
-    name: "Performance",
-    path: "/console/performance",
-    icon: "i-uil-tachometer-fast",
+    name: "Inquiries",
+    path: "/console/inquiries",
+    icon: "i-uil-comment-message",
+    badge: "12",
   },
 ];
 
@@ -263,4 +316,11 @@ const accountLinks = [
     icon: "i-uil-comment-alt-message",
   },
 ];
+
+const isLinkActive = (path) => {
+  if (path === '/console') {
+    return route.path === path
+  }
+  return route.path.startsWith(path)
+}
 </script>
