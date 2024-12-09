@@ -4,7 +4,14 @@
     <ConsoleSidebar />
 
     <!-- Main Content -->
-    <div :class="[contentMargin, 'transition-all duration-300 md:relative']">
+    <div 
+      :class="[
+        'transition-all duration-300 ease-in-out transform',
+        { 'md:ml-64': !sidebarStore.isCollapsed },
+        { 'md:ml-24': sidebarStore.isCollapsed },
+        { 'ml-0': isMobile }
+      ]"
+    >
       <ConsoleHeader />
       <slot />
     </div>
@@ -12,113 +19,66 @@
 </template>
 
 <script setup>
+import { ref, onMounted, computed, onUnmounted } from 'vue';
+import { debounce } from 'lodash-es';
+
 const sidebarStore = useSidebarStore();
+const isMobile = ref(false);
 
-// Reactive margin state
-const contentMargin = ref("ml-64");
+// Check if we're on client-side
+const isClient = computed(() => import.meta.client);
 
-// Computed property to get current margin
-const calculateMargin = computed(() => {
-  if (!import.meta.client) return "ml-64";
-
-  const width = window.innerWidth;
-  console.log("Calculating margin - Width:", width, "Collapsed:", sidebarStore.isCollapsed);
-
-  // Mobile view
-  if (width < 768) {
-    console.log("Mobile view - using ml-0");
-    return "ml-0";
+onMounted(() => {
+  if (isClient.value) {
+    // Initialize sidebar state
+    sidebarStore.initializeState();
+    
+    // Initial check
+    checkMobileView();
+    
+    // Add resize listener
+    window.addEventListener('resize', handleResize);
   }
-  
-  // Tablet/Desktop view
-  const margin = sidebarStore.isCollapsed ? "ml-20" : "ml-64";
-  console.log("Desktop view - using", margin);
-  return margin;
 });
 
-// Watch for changes that should affect margin
-if (import.meta.client) {
-  // Update margin when computed value changes
-  watch(
-    calculateMargin,
-    (newMargin) => {
-      contentMargin.value = newMargin;
-    },
-    { immediate: true }
-  );
-
-  // Watch for sidebar collapse state
-  watch(
-    () => sidebarStore.isCollapsed,
-    () => {
-      contentMargin.value = calculateMargin.value;
-    }
-  );
-}
-
-// Handle window resize
-const handleResize = () => {
-  if (!import.meta.client) return;
-
-  const width = window.innerWidth;
-  console.log("Resize - Window width:", width);
-  
-  if (width >= 768) {
-    sidebarStore.closeMobileMenu();
-    if (width < 1024) {
-      sidebarStore.setCollapsed(true);
-      console.log("Setting sidebar collapsed: true");
-    } else {
-      sidebarStore.setCollapsed(false);
-      console.log("Setting sidebar collapsed: false");
-    }
-  } else {
-    sidebarStore.setCollapsed(false);
-    console.log("Mobile view - Setting sidebar collapsed: false");
+// Check mobile view
+const checkMobileView = () => {
+  if (isClient.value) {
+    isMobile.value = window.innerWidth < 768;
   }
-
-  // Force recalculation of margin
-  contentMargin.value = calculateMargin.value;
-  console.log("Updated margin to:", contentMargin.value);
 };
 
-// Add resize listener only on client-side
-if (import.meta.client) {
-  // Add resize observer for more reliable resize detection
-  const resizeObserver = new ResizeObserver(debounce(() => {
-    console.log("ResizeObserver triggered");
-    handleResize();
-  }, 100));
+// Handle window resize
+const handleResize = debounce(() => {
+  if (isClient.value) {
+    checkMobileView();
+    if (isMobile.value) {
+      sidebarStore.closeMobileMenu();
+    }
+  }
+}, 200);
 
-  onMounted(() => {
-    handleResize(); // Initial check
-    window.addEventListener("resize", handleResize);
-    resizeObserver.observe(document.documentElement);
-    console.log("Mounted - Initial margin:", contentMargin.value);
-  });
-
-  onUnmounted(() => {
-    window.removeEventListener("resize", handleResize);
-    resizeObserver.disconnect();
-  });
-
-  // Watch for any changes that affect layout
-  watch([
-    () => contentMargin.value,
-    () => sidebarStore.isCollapsed,
-    () => window.innerWidth
-  ], ([margin, collapsed, width]) => {
-    console.log("State changed - Margin:", margin, "Collapsed:", collapsed, "Width:", width);
-  });
-}
+// Clean up
+onUnmounted(() => {
+  if (isClient.value) {
+    window.removeEventListener('resize', handleResize);
+  }
+});
 </script>
 
 <style scoped>
-.ml-64 {
+.ml-56 {
   margin-left: 13rem /* 224px */;
 }
 
-.ml-20 {
+.ml-24 {
   margin-left: 6rem /* 96px */;
+}
+
+/* Ensure smooth transitions */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
 }
 </style>

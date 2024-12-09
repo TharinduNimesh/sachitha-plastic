@@ -41,6 +41,12 @@
    - Example: Web/Header/Logo.vue -> <WebHeaderLogo />
    - Keep names descriptive and consistent
 
+## Development Guidelines
+1. Package Management
+   - Use Bun as the primary package manager
+   - Run all package installations and scripts with Bun
+   - Keep package.json and bun.lockb in sync
+
 ## Development Rules
 1. Nuxt.js Specific
    - No need for explicit import statements
