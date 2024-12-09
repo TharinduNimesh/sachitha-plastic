@@ -1,5 +1,6 @@
 export const useProducts = () => {
   const products = [
+    // Raw Materials
     {
       id: 1,
       name: "Eco Storage Container",
@@ -55,12 +56,14 @@ export const useProducts = () => {
         "https://5.imimg.com/data5/SELLER/Default/2023/9/347707470/VD/KJ/VV/27965550/plastic-waste-recycling-machine.jpg",
       link: "/products/recycling-machine",
       features: [
-        "High efficiency",
-        "Low energy consumption",
-        "Easy to operate",
-        "Durable",
+        "Efficient recycling",
+        "Multiple material compatibility",
+        "Energy-efficient",
+        "Safety features",
       ],
     },
+
+    // Machinery
     {
       id: 5,
       name: "Storage Box Set",
@@ -70,11 +73,11 @@ export const useProducts = () => {
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjxLMTE9gHymaANt4Btb9Ubn_u15SIyo_BSA&s",
       link: "/products/storage-box-set",
       features: [
-        "Secure locking",
-        "Stackable",
-        "Durable plastic",
-        "Transparent design",
-      ],
+        'High-capacity shredding',
+        'Multiple material compatibility',
+        'Energy-efficient',
+        'Safety features'
+      ]
     },
     {
       id: 6,
@@ -85,11 +88,11 @@ export const useProducts = () => {
         "https://cdn.webshopapp.com/shops/31781/files/452353570/industrial-plastic-pallet-1200x1000x150-mm-3-runne.jpg",
       link: "/products/industrial-pallet",
       features: [
-        "Heavy-duty",
-        "Non-slip surface",
-        "Weather-resistant",
-        "Recyclable",
-      ],
+        'AI-powered sorting',
+        'High accuracy',
+        'Multiple plastic type detection',
+        'Automated process'
+      ]
     },
     {
       id: 7,
@@ -100,11 +103,11 @@ export const useProducts = () => {
         "https://onlinestore.anton.lk/front_img/1697609421DSC_8433_1000L_MAX_TANK.JPG",
       link: "/products/water-tank",
       features: [
-        "UV protection",
-        "Large capacity",
-        "Durable",
-        "Easy to install",
-      ],
+        'Precision control',
+        'Multiple die configurations',
+        'Temperature regulation',
+        'Low waste production'
+      ]
     },
     {
       id: 8,
@@ -115,11 +118,69 @@ export const useProducts = () => {
         "https://i5.walmartimages.com/seo/Hyper-Tough-16-inch-Toolbox-Plastic-Tool-and-Hardware-Storage-Black_86f427eb-b21b-420b-80a7-6b943ccf8411_2.2bd2520b672ca0330e72bcaa856bad9b.jpeg",
       link: "/products/tool-box",
       features: [
-        "Reinforced structure",
-        "Multiple compartments",
-        "Portable",
-        "Durable",
-      ],
+        'Full-line solution',
+        'High efficiency',
+        'Minimal material loss',
+        'Automated operation'
+      ]
+    },
+
+    // Packaging
+    {
+      id: 9,
+      name: 'Eco-Friendly Packaging Rolls',
+      category: 'Packaging',
+      description: 'Sustainable packaging solutions made from 100% recycled plastic materials.',
+      image: 'https://ueeshop.ly200-cdn.com/u_file/UPAX/UPAX135/2212/products/11/10e493b4da.jpg',
+      link: '/products/packaging-rolls',
+      features: [
+        '100% recycled content',
+        'Customizable width',
+        'Strong and durable',
+        'Environmentally certified'
+      ]
+    },
+    {
+      id: 10,
+      name: 'Compostable Plastic Bags',
+      category: 'Packaging',
+      description: 'Fully compostable plastic bags for environmentally conscious packaging needs.',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiPae9R79DRDvYziZmJOlit6DE6SYQteQN1Q&s',
+      link: '/products/compostable-bags',
+      features: [
+        'Fully biodegradable',
+        'Food-grade quality',
+        'Multiple size options',
+        'Quick decomposition'
+      ]
+    },
+    {
+      id: 11,
+      name: 'Industrial Stretch Wrap',
+      category: 'Packaging',
+      description: 'High-strength recycled plastic stretch wrap for secure industrial packaging.',
+      image: 'https://d41mw5derfe3u.cloudfront.net/userfiles/images/categories/pac/kag/ing/packaging_and_shipping.stretch_wrap.jpg',
+      link: '/products/stretch-wrap',
+      features: [
+        'High tensile strength',
+        'Made from recycled materials',
+        'Machine and hand wrap',
+        'Puncture-resistant'
+      ]
+    },
+    {
+      id: 12,
+      name: 'Custom Plastic Containers',
+      category: 'Packaging',
+      description: 'Bespoke plastic containers made from recycled materials, tailored to specific requirements.',
+      image: 'https://g7p8z7i2.rocketcdn.me/wp-content/uploads/2020/02/Custom-Wall-Containers.jpg',
+      link: '/products/custom-containers',
+      features: [
+        'Custom design',
+        'Recycled material options',
+        'Various sizes available',
+        'Industry-specific solutions'
+      ]
     },
   ];
 
@@ -128,8 +189,13 @@ export const useProducts = () => {
     return products.find((p) => p.link.endsWith(cleanSlug));
   };
 
+  const getProductsByCategory = (category: string) => {
+    return products.filter((p) => p.category.toLowerCase() === category.toLowerCase());
+  };
+
   return {
     products,
     getProductByLink,
+    getProductsByCategory
   };
 };

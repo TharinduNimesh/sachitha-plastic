@@ -6,16 +6,13 @@
         <nav class="mb-8">
           <ol class="flex items-center space-x-2 text-sm">
             <li>
-              <NuxtLink to="/" class="text-slate-600 hover:text-emerald-600">
+              <NuxtLink to="/" class="text-slate-600 hover:text-emerald-600 font-semibold">
                 Home
               </NuxtLink>
             </li>
             <li><span class="text-slate-400">/</span></li>
             <li>
-              <NuxtLink
-                to="/products"
-                class="text-slate-600 hover:text-emerald-600"
-              >
+              <NuxtLink to="/products" class="text-slate-600 hover:text-emerald-600 font-semibold">
                 Products
               </NuxtLink>
             </li>
@@ -27,25 +24,17 @@
         <!-- Product Details -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <!-- Product Image -->
-          <div class="space-y-4">
-            <div class="aspect-square rounded-2xl overflow-hidden bg-slate-100">
-              <img
-                :src="product.image"
-                :alt="product.name"
-                class="w-full h-full object-cover"
-              />
-            </div>
+          <div class="aspect-square rounded-2xl overflow-hidden bg-slate-100">
+            <img :src="product.image" :alt="product.name" class="w-full h-full object-cover" />
           </div>
 
           <!-- Product Info -->
-          <div class="space-y-6">
+          <div class="bg-white rounded-lg space-y-6">
             <div>
-              <span
-                class="inline-block px-3 py-1 bg-emerald-100 text-emerald-600 rounded-lg text-sm font-medium mb-4"
-              >
+              <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-600 rounded-lg text-sm font-medium mb-4">
                 {{ product.category }}
               </span>
-              <h1 class="text-3xl font-bold text-slate-900">
+              <h1 class="text-4xl font-bold text-slate-900">
                 {{ product.name }}
               </h1>
             </div>
@@ -81,23 +70,11 @@
 
             <!-- Contact Button -->
             <div class="pt-6">
-              <a
-                href="mailto:contact@example.com"
-                class="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all duration-300 font-medium"
-              >
+              <a href="mailto:contact@example.com"
+                class="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all duration-300 font-medium shadow-lg">
                 Contact for Pricing
-                <svg
-                  class="w-5 h-5 ml-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M5 13l4 4L19 7"
-                  />
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
               </a>
             </div>
@@ -106,18 +83,14 @@
       </div>
     </div>
     <div v-else class="pt-32 pb-16 text-center">
-      <p class="text-lg text-slate-600">Product not found</p>
-      <NuxtLink
-        to="/products"
-        class="inline-block mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-300 font-medium"
-      >
-        Back to Products
-      </NuxtLink>
+       <Notfound />
     </div>
   </NuxtLayout>
 </template>
 
 <script setup>
+import Notfound from '~/components/Web/Product/Notfound.vue';
+
 const route = useRoute();
 const { getProductByLink } = useProducts();
 
