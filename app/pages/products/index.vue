@@ -415,52 +415,31 @@
             </div>
 
             <!-- Empty State -->
-            <div v-if="filteredProducts.length === 0" class="text-center py-16">
-              <Icon
-                name="heroicons:magnifying-glass"
-                class="w-12 h-12 mx-auto text-slate-400 mb-4"
-              />
-              <h3 class="text-lg font-medium text-slate-900 mb-2">
-                No products found
-              </h3>
-              <p class="text-slate-600">
-                Try adjusting your search or filter to find what you're looking
-                for.
-              </p>
-              <button
-                @click="resetFilters"
-                class="mt-4 px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+            <motion-fade-in v-if="filteredProducts.length === 0">
+              <div
+                class="text-center py-16 bg-white/50 backdrop-blur-sm rounded-2xl shadow-xl"
               >
-                Reset Filters
-              </button>
-            </div>
+                <Icon
+                  name="heroicons:cube"
+                  class="mx-auto w-24 h-24 text-emerald-300 mb-6"
+                />
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">
+                  No Products Found
+                </h2>
+                <p class="text-slate-600 mb-8 max-w-md mx-auto">
+                  Adjust your search or explore our full range of sustainable
+                  solutions.
+                </p>
+                <button
+                  @click="resetFilters"
+                  class="px-8 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors duration-300 shadow-lg hover:shadow-xl"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            </motion-fade-in>
           </div>
         </div>
-
-        <!-- Empty State -->
-        <motion-fade-in v-if="filteredProducts.length === 0">
-          <div
-            class="text-center py-16 bg-white/50 backdrop-blur-sm rounded-2xl shadow-xl"
-          >
-            <Icon
-              name="heroicons:cube"
-              class="mx-auto w-24 h-24 text-emerald-300 mb-6"
-            />
-            <h2 class="text-3xl font-bold text-slate-800 mb-4">
-              No Products Found
-            </h2>
-            <p class="text-slate-600 mb-8 max-w-md mx-auto">
-              Adjust your search or explore our full range of sustainable
-              solutions.
-            </p>
-            <button
-              @click="resetFilters"
-              class="px-8 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors duration-300 shadow-lg hover:shadow-xl"
-            >
-              Reset Filters
-            </button>
-          </div>
-        </motion-fade-in>
       </div>
     </div>
   </NuxtLayout>
