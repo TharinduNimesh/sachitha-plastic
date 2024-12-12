@@ -22,10 +22,33 @@
         </nav>
 
         <!-- Product Details -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 my-12">
           <!-- Product Image -->
-          <div class="aspect-square rounded-2xl overflow-hidden bg-slate-100">
-            <img :src="product.image" :alt="product.name" class="w-full h-full object-cover" />
+          <div class="my-12">
+            <!-- Image Slider for the Big Image -->
+            <div class="relative aspect-[3/2] rounded-2xl overflow-hidden bg-slate-100">
+              <img v-if="product.image && product.image.length > 0" :src="allImages[currentImageIndex]"
+                :alt="product.name" class="w-full h-full object-cover" />
+              <button v-if="product.image && product.image.length > 0" @click="prevImage"
+                class="absolute left-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full border border-slate-200 hover:bg-blue-50 transition-colors duration-300">
+                <svg class="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button v-if="product.image && product.image.length > 0" @click="nextImage"
+                class="absolute right-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full border border-slate-200 hover:bg-blue-50 transition-colors duration-300">
+                <svg class="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Two Smaller Images -->
+            <div class="grid grid-cols-6 gap-4 mt-4">
+              <div v-for="(image, index) in allImages" :key="index" class="aspect-square rounded-2xl overflow-hidden bg-slate-100">
+                <img :src="image" :alt="product.name" class="w-full h-full object-cover" />
+              </div>
+            </div>
           </div>
 
           <!-- Product Info -->
@@ -45,9 +68,7 @@
 
               <!-- Additional details -->
               <div class="mt-6 space-y-4">
-                <h3 class="text-lg font-semibold text-slate-900">
-                  Key Features:
-                </h3>
+                <h3 class="text-lg font-semibold text-slate-900">Key Features:</h3>
                 <ul class="list-disc pl-5 space-y-2">
                   <li v-for="(feature, index) in product.features" :key="index">
                     {{ feature }}
@@ -80,22 +101,53 @@
             </div>
           </div>
         </div>
+
+        <!-- Similar Products Section -->
+        <WebProductSimilarProduct :products="similarProducts" />
       </div>
     </div>
     <div v-else class="pt-32 pb-16 text-center">
-       <Notfound />
+      <WebProductNotfound />
     </div>
   </NuxtLayout>
 </template>
 
 <script setup>
-import Notfound from '~/components/Web/Product/Notfound.vue';
+const props = defineProps({
+  product: {
+    type: Object,
+    required: true,
+  },
+});
+
+const allImages = computed(() => {
+  console.log('Product:', product.value); // Debugging statement
+  return product.value?.image ?? []; // Fallback to an empty array if undefined
+});
+
+const currentImageIndex = ref(0);
+
+const nextImage = () => {
+  if (allImages.value.length === 0) return;
+  currentImageIndex.value =
+    (currentImageIndex.value + 1) % allImages.value.length;
+};
+
+const prevImage = () => {
+  if (allImages.value.length === 0) return;
+  currentImageIndex.value =
+    (currentImageIndex.value - 1 + allImages.value.length) % allImages.value.length;
+};
 
 const route = useRoute();
-const { getProductByLink } = useProducts();
+const { getProductByLink, getSimilarProducts } = useProducts();
 
 const product = computed(() => {
   const slug = route.params.id;
   return getProductByLink(`/products/${slug}`);
+});
+
+const similarProducts = computed(() => {
+  return getSimilarProducts(product.value?.category, product.value?.id);
 });
 </script>

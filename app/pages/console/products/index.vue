@@ -9,10 +9,10 @@
             Manage your product catalog and inventory
           </p>
         </div>
-        <button class="btn-primary flex items-center space-x-2">
+        <NuxtLink to="/console/products/new" class="btn-primary flex items-center space-x-2">
           <Icon name="i-uil-plus" class="w-5 h-5" />
           <span>Add Product</span>
-        </button>
+        </NuxtLink>
       </div>
 
       <!-- Filters Section -->
