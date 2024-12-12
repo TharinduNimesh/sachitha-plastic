@@ -13,6 +13,7 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  Filler,
   Title,
   Tooltip,
   Legend
@@ -22,6 +23,7 @@ ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
+  Filler,
   LineElement,
   Title,
   Tooltip,
@@ -40,7 +42,8 @@ const chartData = computed(() => ({
       label: 'Page Views',
       data: props.data,
       borderColor: '#059669',
-      backgroundColor: '#059669',
+      backgroundColor: 'rgba(6, 182, 112, 0.2)',
+      fill: true,
       tension: 0.4,
       pointRadius: 2
     }
@@ -68,6 +71,5 @@ const chartOptions = {
       }
     }
   },
-  backgroundColor: 'rgba(6, 182, 112, 0.2)' // Light emerald background
 }
 </script>

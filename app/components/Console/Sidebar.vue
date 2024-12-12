@@ -233,7 +233,7 @@ nav::-webkit-scrollbar {
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 const sidebarStore = useSidebarStore();
 const route = useRoute();
 
@@ -295,11 +295,6 @@ const otherLinks = [
 ];
 
 const accountLinks = [
-  {
-    name: "Account",
-    path: "/console/account",
-    icon: "i-uil-user",
-  },
   {
     name: "Members",
     path: "/console/members",
