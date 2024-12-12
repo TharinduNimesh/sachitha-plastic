@@ -38,11 +38,12 @@
 
         <!-- Category Badge -->
         <div class="absolute top-4 left-4">
-          <span
-            class="px-3 py-1.5 bg-white/95 backdrop-blur-sm text-emerald-600 rounded-lg text-sm font-medium"
+          <NuxtLink
+            :to="`/products/category/${product.category.toLowerCase()}`"
+            class="px-3 py-1.5 bg-white/95 backdrop-blur-sm text-emerald-600 rounded-lg text-sm font-medium hover:bg-white hover:text-emerald-700 transition-colors duration-300"
           >
             {{ product.category }}
-          </span>
+          </NuxtLink>
         </div>
       </div>
 
@@ -72,7 +73,7 @@
 
           <!-- Learn More Link -->
           <NuxtLink
-            :to="product.link"
+            :to="`/products/category/${product.category.toLowerCase()}`"
             class="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors duration-300"
           >
             Learn More
