@@ -103,7 +103,7 @@
         </div>
 
         <!-- Similar Products Section -->
-        <WebSimilarProduct :products="similarProducts" />
+        <WebProductSimilarProduct :products="similarProducts" />
       </div>
     </div>
     <div v-else class="pt-32 pb-16 text-center">

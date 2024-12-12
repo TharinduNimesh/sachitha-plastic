@@ -1,21 +1,22 @@
 <template>
   <NuxtLayout name="web">
-    <div class="min-h-screen bg-gradient-to-br py-24 px-4">
-      <div class="container mx-auto">
-        <div 
-          style="width: 100vw; height: 35vh; background-image: url('/images/categories/household-category.jpg'); background-size: cover; background-position: center; margin-left: calc(-50vw + 50%); position: relative;">
-          <div
-            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6);">
+    <div class="min-h-screen bg-gradient-to-br py-24">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Hero Section -->
+        <div class="max-w-4xl mx-auto text-center mb-16">
+          <div class="mb-12">
+            <span class="inline-block px-4 py-1 bg-emerald-100 text-emerald-600 rounded-full text-sm font-medium mb-4">
+              Our Category
+            </span>
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              Explore Our Category Range
+            </h1>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+              Discover our comprehensive collection of high-quality plastic
+              products and recycling machinery designed to meet your industrial
+              needs.
+            </p>
           </div>
-            <div class="container mx-auto absolute inset-0 flex flex-col justify-center items-start text-left p-4">
-              <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">
-              Household Products
-              </h1>
-              <p class="text-white max-w-2xl">
-              Explore our premium range of durable household plastic products, crafted to enhance your everyday
-              living.
-              </p>
-            </div>
         </div>
 
         <!-- Filters Section -->
@@ -23,11 +24,15 @@
           <div class="flex flex-col gap-6">
             <!-- Search Bar -->
             <div class="relative max-w-2xl">
-              <div class="relative">
-                <input type="text" v-model="searchQuery" placeholder="Search products by name or status..."
+              <form @submit.prevent="handleSearch" class="relative">
+                <input type="text" v-model="searchQuery" placeholder="Search products by name, category or status..."
                   class="w-full pl-12 pr-4 h-12 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200" />
                 <Icon name="i-uil-search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              </div>
+                <button type="submit"
+                  class="absolute right-0 top-1/2 -translate-y-1/2 px-6 py-3.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm">
+                  Search
+                </button>
+              </form>
             </div>
 
             <!-- Filters Section -->
@@ -35,6 +40,16 @@
               <!-- Active Filters Display -->
               <div class="flex flex-wrap items-center gap-2">
                 <span v-if="!hasActiveFilters" class="text-sm text-slate-500">No active filters</span>
+
+                <!-- Category Filter Tag -->
+                <span v-if="selectedCategory"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg text-sm font-medium">
+                  <Icon name="i-uil-box" class="w-4 h-4" />
+                  {{ selectedCategory }}
+                  <button @click="selectedCategory = ''" class="hover:text-emerald-800">
+                    <Icon name="i-uil-times" class="w-4 h-4" />
+                  </button>
+                </span>
 
                 <!-- Status Filter Tag -->
                 <span v-if="selectedStatus"
@@ -61,13 +76,24 @@
                     class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors duration-200">
                     <Icon name="i-uil-filter" class="w-5 h-5 text-slate-600" />
                     <span class="text-sm font-medium text-slate-700">Filters</span>
-                    <Icon :name="isFilterMenuOpen ? 'i-uil-angle-up' : 'i-uil-angle-down'
-                      " class="w-5 h-5 text-slate-600" />
+                    <Icon :name="isFilterMenuOpen ? 'i-uil-angle-up' : 'i-uil-angle-down'"
+                      class="w-5 h-5 text-slate-600" />
                   </button>
 
                   <!-- Filter Dropdown -->
                   <div v-if="isFilterMenuOpen"
                     class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-slate-200 p-4 z-10">
+                    <!-- Category Filter -->
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-slate-700 mb-2">Category</label>
+                      <select v-model="selectedCategory"
+                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+                        <option value="">All Categories</option>
+                        <option v-for="category in uniqueCategories" :key="category">
+                          {{ category }}
+                        </option>
+                      </select>
+                    </div>
 
                     <!-- Status Filter -->
                     <div>
@@ -89,8 +115,8 @@
                     class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors duration-200">
                     <Icon name="i-uil-sort" class="w-5 h-5 text-slate-600" />
                     <span class="text-sm font-medium text-slate-700">Sort</span>
-                    <Icon :name="isSortMenuOpen ? 'i-uil-angle-up' : 'i-uil-angle-down'
-                      " class="w-5 h-5 text-slate-600" />
+                    <Icon :name="isSortMenuOpen ? 'i-uil-angle-up' : 'i-uil-angle-down'"
+                      class="w-5 h-5 text-slate-600" />
                   </button>
 
                   <!-- Sort Dropdown -->
@@ -109,41 +135,9 @@
           </div>
         </div>
 
-        <!-- Latest Products Section -->
-        <div class="mt-12 -mx-4 sm:-mx-6 lg:-mx-8">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <!-- Section Header -->
-            <div class="flex justify-between items-center mb-12">
-              <h2 class="text-3xl md:text-4xl font-bold text-slate-900">
-                Latest Products
-              </h2>
-              <div class="flex gap-4">
-                <button @click="scrollLeft"
-                  class="p-3 rounded-full border border-slate-200 hover:bg-emerald-50 transition-colors duration-300">
-                  <Icon name="heroicons:chevron-left" class="w-6 h-6 text-slate-600" />
-                </button>
-                <button @click="scrollRight"
-                  class="p-3 rounded-full border border-slate-200 hover:bg-emerald-50 transition-colors duration-300">
-                  <Icon name="heroicons:chevron-right" class="w-6 h-6 text-slate-600" />
-                </button>
-              </div>
-            </div>
-
-            <!-- Scrollable Container -->
-            <div class="relative overflow-hidden">
-              <div ref="productScrollContainer" class="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
-                style="scroll-behavior: smooth">
-                <div v-for="product in filteredProducts.slice(0, 6)" :key="product.id" class="flex-none w-72">
-                  <WebProductCard :product="product" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- All Product Grid -->
-        <div class="mt-16">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div v-if="filteredProducts.length > 0">
+          <!-- Category Products Section -->
+          <div class="mt-16">
             <!-- Grid Header -->
             <div class="flex flex-col md:flex-row justify-between items-center mb-8">
               <div>
@@ -187,7 +181,7 @@
                   <!-- Product Image -->
                   <div class="relative w-40 h-40 flex-shrink-0">
                     <img :src="product.image" :alt="product.name" class="w-full h-full object-cover rounded-lg" />
-                    <span
+                    <span v-if="product.isNew"
                       class="absolute top-2 right-2 px-2 py-1 bg-emerald-500 text-white text-xs font-medium rounded-full">
                       New
                     </span>
@@ -220,7 +214,7 @@
             </div>
 
             <!-- Load More Button -->
-            <div v-if="displayedItems < filteredProducts.length" class="text-center mt-8">
+            <div v-if="hasMoreItems" class="text-center mt-8">
               <button @click="loadMore"
                 class="inline-flex items-center gap-2 px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
                 <span>Load More</span>
@@ -231,28 +225,13 @@
                 {{ filteredProducts.length }} products
               </p>
             </div>
-
-
           </div>
+          <!-- All Product Grid -->
+          <WebProductAllProduct />
         </div>
-
-        <!-- Empty State -->
-        <motion-fade-in v-if="filteredProducts.length === 0">
-          <div class="text-center py-16 bg-white/50 backdrop-blur-sm rounded-2xl shadow-xl">
-            <Icon name="heroicons:cube" class="mx-auto w-24 h-24 text-emerald-300 mb-6" />
-            <h2 class="text-3xl font-bold text-slate-800 mb-4">
-              No Products Found
-            </h2>
-            <p class="text-slate-600 mb-8 max-w-md mx-auto">
-              Adjust your search or explore our full range of sustainable
-              solutions.
-            </p>
-            <button @click="clearFilters"
-              class="px-8 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors duration-300 shadow-lg hover:shadow-xl">
-              Reset Filters
-            </button>
-          </div>
-        </motion-fade-in>
+        <div v-else class="pt-32 pb-16 text-center">
+          <WebProductNotfound />
+        </div>
       </div>
     </div>
   </NuxtLayout>
@@ -260,78 +239,70 @@
 
 <script setup lang="ts">
 const { products } = useProducts();
+const route = useRoute();
+const categoryName = route.params.name as string;
 
 // Reactive state
 const searchQuery = ref("");
-const selectedCategory = ref("");
-const selectedStatus = ref("");
 const isFilterMenuOpen = ref(false);
 const isSortMenuOpen = ref(false);
+const selectedStatus = ref("");
 const sortBy = ref("newest");
 const filterMenuRef = ref(null);
 const sortMenuRef = ref(null);
-const productScrollContainer = ref(null);
-const trendingScrollContainer = ref(null);
 const viewMode = ref("grid");
 
+// Filter products based on category, search, and status
+const filteredProducts = computed(() => {
+  if (!products) return [];
+  
+  return products.filter(product => {
+    const matchesCategory = product.category.toLowerCase() === categoryName.toLowerCase();
+    const matchesSearch = searchQuery.value === "" || 
+      product.name.toLowerCase().includes(searchQuery.value.toLowerCase());
+    const matchesStatus = selectedStatus.value === "" || 
+      product.status === selectedStatus.value;
+    
+    return matchesCategory && matchesSearch && matchesStatus;
+  });
+});
+
 // Load More functionality
-const gridItemsPerPage = 8; // Items per page for grid view
-const listItemsPerPage = 5; // Items per page for list view
-const displayedItems = ref(gridItemsPerPage); // Current number of displayed items
+const gridItemsPerPage = 12;
+const listItemsPerPage = 8;
+const displayedItems = ref(viewMode.value === "grid" ? gridItemsPerPage : listItemsPerPage);
 
 const loadMore = () => {
-  // Increase based on view mode
-  const increment =
-    viewMode.value === "grid" ? gridItemsPerPage : listItemsPerPage;
+  const increment = viewMode.value === "grid" ? gridItemsPerPage : listItemsPerPage;
   displayedItems.value += increment;
 };
 
-// Watch view mode changes to reset displayed items
-watch(viewMode, (newMode) => {
-  displayedItems.value =
-    newMode === "grid" ? gridItemsPerPage : listItemsPerPage;
-});
-
-// Sort options
-const sortOptions = [
-  { label: "Newest First", value: "newest", icon: "i-uil-clock" },
-  { label: "Oldest First", value: "oldest", icon: "i-uil-history" },
-  { label: "Name A-Z", value: "name_asc", icon: "i-uil-sort-amount-down" },
-  { label: "Name Z-A", value: "name_desc", icon: "i-uil-sort-amount-up" },
-];
-
-// Computed properties
-const hasActiveFilters = computed(() => {
-  return selectedCategory.value || selectedStatus.value;
-});
-
-const filteredProducts = computed(() => {
-  return products.filter((product) => {
-    const matchesSearch =
-      !searchQuery.value ||
-      product.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      product.description
-        .toLowerCase()
-        .includes(searchQuery.value.toLowerCase());
-
-    const matchesStatus =
-      !selectedStatus.value || product.status === selectedStatus.value;
-
-    return matchesSearch && matchesStatus;
-  });
+// Computed property for has more items
+const hasMoreItems = computed(() => {
+  return displayedItems.value < filteredProducts.value.length;
 });
 
 // Methods
 const clearFilters = () => {
   searchQuery.value = "";
-  selectedCategory.value = "";
   selectedStatus.value = "";
+  sortBy.value = "newest";
 };
 
-const selectSortOption = (value) => {
+const selectSortOption = (value: string) => {
   sortBy.value = value;
   isSortMenuOpen.value = false;
 };
+
+// Search handler
+const handleSearch = () => {
+  displayedItems.value = viewMode.value === "grid" ? gridItemsPerPage : listItemsPerPage;
+};
+
+// Watch view mode changes to reset displayed items
+watch(viewMode, (newMode) => {
+  displayedItems.value = newMode === "grid" ? gridItemsPerPage : listItemsPerPage;
+});
 
 // Click outside to close dropdowns
 onMounted(() => {
@@ -344,52 +315,6 @@ onMounted(() => {
     }
   });
 });
-
-// Scroll Methods
-const scrollLeft = () => {
-  if (productScrollContainer.value) {
-    const container = productScrollContainer.value;
-    const scrollAmount = container.clientWidth * 0.8;
-    container.scrollBy({
-      left: -scrollAmount,
-      behavior: "smooth",
-    });
-  }
-};
-
-const scrollRight = () => {
-  if (productScrollContainer.value) {
-    const container = productScrollContainer.value;
-    const scrollAmount = container.clientWidth * 0.8;
-    container.scrollBy({
-      left: scrollAmount,
-      behavior: "smooth",
-    });
-  }
-};
-
-// Trending Products Scroll Methods
-const scrollTrendingLeft = () => {
-  if (trendingScrollContainer.value) {
-    const container = trendingScrollContainer.value;
-    const scrollAmount = container.clientWidth * 0.8;
-    container.scrollBy({
-      left: -scrollAmount,
-      behavior: "smooth",
-    });
-  }
-};
-
-const scrollTrendingRight = () => {
-  if (trendingScrollContainer.value) {
-    const container = trendingScrollContainer.value;
-    const scrollAmount = container.clientWidth * 0.8;
-    container.scrollBy({
-      left: scrollAmount,
-      behavior: "smooth",
-    });
-  }
-};
 </script>
 
 <style scoped>
