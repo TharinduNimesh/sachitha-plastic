@@ -5,76 +5,73 @@
       <div class="flex items-center justify-between mb-8">
         <div>
           <h1 class="text-2xl font-bold text-slate-900">Inquiries</h1>
-          <p class="mt-1 text-slate-600">
-            Manage customer inquiries and messages
-          </p>
+          <p class="text-slate-600">Manage customer inquiries and messages</p>
         </div>
-        <button class="btn-secondary flex items-center space-x-2">
-          <Icon name="i-uil-download-alt" class="w-5 h-5" />
-          <span>Export CSV</span>
-        </button>
       </div>
 
-      <!-- Filters Section -->
+      <!-- Filters and Search -->
       <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
         <div class="flex flex-col gap-6">
           <!-- Search Bar -->
           <div class="relative max-w-2xl">
             <div class="relative">
               <input
-                type="text"
                 v-model="searchQuery"
-                placeholder="Search inquiries by name, email or subject..."
-                class="w-full pl-12 pr-4 h-12 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200"
+                type="text"
+                placeholder="Search inquiries..."
+                class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
               <Icon
                 name="i-uil-search"
-                class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+                class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
               />
             </div>
           </div>
 
-          <!-- Filters Section -->
           <div class="flex flex-wrap items-center gap-4">
             <!-- Active Filters Display -->
             <div class="flex flex-wrap items-center gap-2">
               <span v-if="!hasActiveFilters" class="text-sm text-slate-500">
                 {{ filteredInquiries.length }} inquiries found
               </span>
+              <template v-else>
+                <!-- Status Filter Tag -->
+                <div
+                  v-if="selectedStatus"
+                  class="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 rounded-full text-sm"
+                >
+                  <span>Status: {{ selectedStatus }}</span>
+                  <button
+                    @click="selectedStatus = ''"
+                    class="text-slate-400 hover:text-slate-600"
+                  >
+                    <Icon name="i-uil-times" class="w-4 h-4" />
+                  </button>
+                </div>
 
-              <!-- Status Filter Tag -->
-              <span
-                v-if="selectedStatus"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-slate-600 rounded-lg text-sm font-medium"
-              >
-                <Icon name="i-uil-circle" class="w-4 h-4" />
-                {{ selectedStatus }}
-                <button @click="selectedStatus = ''" class="hover:text-slate-800">
-                  <Icon name="i-uil-times" class="w-4 h-4" />
+                <!-- Date Range Filter Tag -->
+                <div
+                  v-if="selectedDateRange"
+                  class="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 rounded-full text-sm"
+                >
+                  <span>{{ selectedDateRange }}</span>
+                  <button
+                    @click="selectedDateRange = ''"
+                    class="text-slate-400 hover:text-slate-600"
+                  >
+                    <Icon name="i-uil-times" class="w-4 h-4" />
+                  </button>
+                </div>
+
+                <!-- Clear All Button -->
+                <button
+                  v-if="hasActiveFilters"
+                  @click="clearFilters"
+                  class="text-sm text-emerald-600 hover:text-emerald-700"
+                >
+                  Clear all
                 </button>
-              </span>
-
-              <!-- Date Range Filter Tag -->
-              <span
-                v-if="selectedDateRange"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-slate-600 rounded-lg text-sm font-medium"
-              >
-                <Icon name="i-uil-calendar-alt" class="w-4 h-4" />
-                {{ selectedDateRange }}
-                <button @click="selectedDateRange = ''" class="hover:text-slate-800">
-                  <Icon name="i-uil-times" class="w-4 h-4" />
-                </button>
-              </span>
-
-              <!-- Clear All Filters -->
-              <button
-                v-if="hasActiveFilters"
-                @click="clearFilters"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900"
-              >
-                Clear all
-                <Icon name="i-uil-times" class="w-4 h-4" />
-              </button>
+              </template>
             </div>
 
             <div class="flex items-center gap-3 ml-auto">
@@ -82,47 +79,55 @@
               <div class="relative" ref="filterMenuRef">
                 <button
                   @click="isFilterMenuOpen = !isFilterMenuOpen"
-                  class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors duration-200"
+                  class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50"
                 >
-                  <Icon name="i-uil-filter" class="w-5 h-5 text-slate-600" />
-                  <span class="text-sm font-medium text-slate-700">Filters</span>
-                  <Icon
-                    :name="isFilterMenuOpen ? 'i-uil-angle-up' : 'i-uil-angle-down'"
-                    class="w-5 h-5 text-slate-600"
-                  />
+                  <Icon name="i-uil-filter" class="w-5 h-5" />
+                  <span>Filter</span>
                 </button>
 
-                <!-- Filter Dropdown -->
+                <!-- Filter Menu -->
                 <div
                   v-if="isFilterMenuOpen"
-                  class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-slate-200 p-4 z-10"
+                  class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-slate-200 z-10"
                 >
-                  <!-- Status Filter -->
-                  <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Status</label>
-                    <select
-                      v-model="selectedStatus"
-                      class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-                    >
-                      <option value="">All Status</option>
-                      <option>Pending</option>
-                      <option>Resolved</option>
-                      <option>Spam</option>
-                    </select>
-                  </div>
+                  <div class="p-4">
+                    <h3 class="font-medium text-slate-900 mb-3">Filter by Status</h3>
+                    <div class="space-y-2">
+                      <label
+                        v-for="status in ['Pending', 'Resolved']"
+                        :key="status"
+                        class="flex items-center gap-2"
+                      >
+                        <input
+                          type="radio"
+                          :value="status"
+                          v-model="selectedStatus"
+                          name="status"
+                          class="text-emerald-600 focus:ring-emerald-500"
+                        />
+                        <span>{{ status }}</span>
+                      </label>
+                    </div>
 
-                  <!-- Date Range Filter -->
-                  <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Date Range</label>
-                    <select
-                      v-model="selectedDateRange"
-                      class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-                    >
-                      <option value="">All Time</option>
-                      <option>Last 7 Days</option>
-                      <option>Last 30 Days</option>
-                      <option>Last 3 Months</option>
-                    </select>
+                    <hr class="my-4" />
+
+                    <h3 class="font-medium text-slate-900 mb-3">Date Range</h3>
+                    <div class="space-y-2">
+                      <label
+                        v-for="range in ['Last 7 Days', 'Last 30 Days', 'Last 90 Days']"
+                        :key="range"
+                        class="flex items-center gap-2"
+                      >
+                        <input
+                          type="radio"
+                          :value="range"
+                          v-model="selectedDateRange"
+                          name="dateRange"
+                          class="text-emerald-600 focus:ring-emerald-500"
+                        />
+                        <span>{{ range }}</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -131,31 +136,31 @@
               <div class="relative" ref="sortMenuRef">
                 <button
                   @click="isSortMenuOpen = !isSortMenuOpen"
-                  class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors duration-200"
+                  class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50"
                 >
-                  <Icon name="i-uil-sort" class="w-5 h-5 text-slate-600" />
-                  <span class="text-sm font-medium text-slate-700">Sort</span>
-                  <Icon
-                    :name="isSortMenuOpen ? 'i-uil-angle-up' : 'i-uil-angle-down'"
-                    class="w-5 h-5 text-slate-600"
-                  />
+                  <Icon name="i-uil-sort" class="w-5 h-5" />
+                  <span>Sort</span>
                 </button>
 
-                <!-- Sort Dropdown -->
+                <!-- Sort Menu -->
                 <div
                   v-if="isSortMenuOpen"
-                  class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200 p-1 z-10"
+                  class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200 z-10"
                 >
-                  <button
-                    v-for="option in sortOptions"
-                    :key="option.value"
-                    @click="selectSortOption(option.value)"
-                    class="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg"
-                    :class="{ 'bg-slate-50': sortBy === option.value }"
-                  >
-                    <Icon :name="option.icon" class="w-4 h-4" />
-                    {{ option.label }}
-                  </button>
+                  <div class="p-2">
+                    <button
+                      v-for="option in [
+                        { value: 'newest', label: 'Newest First' },
+                        { value: 'oldest', label: 'Oldest First' },
+                      ]"
+                      :key="option.value"
+                      @click="selectSortOption(option.value)"
+                      class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50"
+                      :class="{ 'text-emerald-600': sortBy === option.value }"
+                    >
+                      {{ option.label }}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -163,36 +168,66 @@
         </div>
       </div>
 
-      <!-- Inquiries List -->
-      <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-        <ConsoleInquiriesList
-          v-for="inquiry in paginatedInquiries"
-          :key="inquiry.id"
-          v-bind="inquiry"
-          @resolve="handleResolve(inquiry)"
-          @delete="handleDelete(inquiry)"
-        />
+      <!-- Loading State -->
+      <div v-if="isLoading" class="bg-white rounded-xl shadow-sm p-8 text-center">
+        <div class="flex items-center justify-center">
+          <Icon name="i-uil-spinner" class="w-8 h-8 animate-spin text-emerald-600" />
+        </div>
       </div>
 
-      <!-- Pagination -->
-      <div class="mt-8 flex items-center justify-between">
-        <div class="text-sm text-slate-600">
-          Showing {{ paginationStart }} to {{ paginationEnd }} of {{ totalInquiries }} inquiries
+      <!-- Empty State -->
+      <div
+        v-else-if="inquiries.length === 0"
+        class="bg-white rounded-xl shadow-sm p-8 text-center"
+      >
+        <Icon
+          name="i-uil-envelope"
+          class="w-16 h-16 mx-auto mb-4 text-slate-400"
+        />
+        <h3 class="text-lg font-medium text-slate-900 mb-2">No inquiries yet</h3>
+        <p class="text-slate-600">
+          When customers send inquiries, they will appear here.
+        </p>
+      </div>
+
+      <!-- Inquiries List -->
+      <div v-else class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div v-if="paginatedInquiries.length === 0" class="p-8 text-center">
+          <Icon name="i-uil-envelope" class="w-16 h-16 mx-auto mb-4 text-slate-400" />
+          <h3 class="text-lg font-medium text-slate-900 mb-2">No inquiries found</h3>
+          <p class="text-slate-600">
+            Try adjusting your search or filter criteria
+          </p>
         </div>
-        <div class="flex space-x-2">
-          <button 
+        <template v-else>
+          <ConsoleInquiriesList
+            v-for="inquiry in paginatedInquiries"
+            :key="inquiry.id"
+            v-bind="inquiry"
+            @resolve="handleResolve(inquiry)"
+            @delete="handleDelete(inquiry)"
+          />
+        </template>
+
+        <!-- Pagination -->
+        <div
+          v-if="totalPages > 1"
+          class="flex items-center justify-between px-6 py-4 border-t border-slate-200"
+        >
+          <button
             :disabled="currentPage === 1"
             @click="currentPage--"
-            class="btn-secondary px-4 py-2"
-            :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }"
+            class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
-          <button 
+          <span class="text-sm text-slate-600">
+            Page {{ currentPage }} of {{ totalPages }}
+          </span>
+          <button
             :disabled="currentPage === totalPages"
             @click="currentPage++"
-            class="btn-primary px-4 py-2"
-            :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages }"
+            class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>
@@ -203,41 +238,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { onClickOutside } from "@vueuse/core";
+import type { Database } from "~/types";
 
-// Sample inquiries data
-const inquiries = ref([
-  {
-    id: 1,
-    name: "John Smith",
-    email: "john@example.com",
-    subject: "Product Inquiry - Recycling Machine",
-    message: "I would like to know more about your recycling machines and their specifications...",
-    date: "2024-01-20T10:30:00",
-    status: "Pending",
-  },
-  {
-    id: 2,
-    name: "Sarah Johnson",
-    email: "sarah@example.com",
-    subject: "Quote Request - Industrial Equipment",
-    message: "We are looking for industrial equipment for our new facility...",
-    date: "2024-01-19T15:45:00",
-    status: "Resolved",
-  },
-  {
-    id: 3,
-    name: "Michael Brown",
-    email: "michael@example.com",
-    subject: "Bulk Order Information",
-    message: "Interested in placing a bulk order for plastic containers...",
-    date: "2024-01-18T09:15:00",
-    status: "Pending",
-  },
-]);
+type Inquiry = Database['public']['Tables']['inquiries']['Row'];
+type InquiryStatus = Database['public']['Tables']['inquiry_status']['Row'];
+type InquiryWithStatus = Omit<Inquiry, 'status'> & { status: Database['public']['Enums']['InquiryStatus'] | undefined };
 
-// Filter and Sort State
+const supabase = useSupabaseClient<Database>();
+const { success, error } = useToast();
+
+const isLoading = ref(false);
+const inquiries = ref<InquiryWithStatus[]>([]);
 const searchQuery = ref("");
 const selectedStatus = ref("");
 const selectedDateRange = ref("");
@@ -247,82 +260,81 @@ const isSortMenuOpen = ref(false);
 const currentPage = ref(1);
 const itemsPerPage = 5;
 
-// Refs for click outside
-const filterMenuRef = ref(null);
-const sortMenuRef = ref(null);
-
-// Close menus when clicking outside
-onClickOutside(filterMenuRef, () => (isFilterMenuOpen.value = false));
-onClickOutside(sortMenuRef, () => (isSortMenuOpen.value = false));
-
-// Computed Properties
+// Computed property for active filters
 const hasActiveFilters = computed(() => {
   return selectedStatus.value !== "" || selectedDateRange.value !== "";
 });
 
+// Helper function to clear filters
+const clearFilters = () => {
+  selectedStatus.value = "";
+  selectedDateRange.value = "";
+  searchQuery.value = "";
+  currentPage.value = 1;
+};
+
+// Helper function to select sort option
+const selectSortOption = (value: string) => {
+  sortBy.value = value;
+  isSortMenuOpen.value = false;
+};
+
+// Computed filtered inquiries with search and filters
 const filteredInquiries = computed(() => {
-  let result = [...inquiries.value];
+  let filtered = [...inquiries.value];
 
   // Apply search filter
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
-    result = result.filter(
-      (inquiry) =>
+    filtered = filtered.filter(
+      inquiry =>
         inquiry.name.toLowerCase().includes(query) ||
         inquiry.email.toLowerCase().includes(query) ||
-        inquiry.subject.toLowerCase().includes(query)
+        inquiry.subject.toLowerCase().includes(query) ||
+        inquiry.message.toLowerCase().includes(query)
     );
   }
 
   // Apply status filter
   if (selectedStatus.value) {
-    result = result.filter((inquiry) => inquiry.status === selectedStatus.value);
+    filtered = filtered.filter(inquiry => inquiry.status === selectedStatus.value);
   }
 
   // Apply date range filter
   if (selectedDateRange.value) {
     const now = new Date();
-    const inquiryDate = (date: string) => new Date(date);
-    
+    let cutoffDate = new Date();
+
     switch (selectedDateRange.value) {
       case "Last 7 Days":
-        const sevenDaysAgo = new Date(now.setDate(now.getDate() - 7));
-        result = result.filter((inquiry) => inquiryDate(inquiry.date) >= sevenDaysAgo);
+        cutoffDate.setDate(now.getDate() - 7);
         break;
       case "Last 30 Days":
-        const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
-        result = result.filter((inquiry) => inquiryDate(inquiry.date) >= thirtyDaysAgo);
+        cutoffDate.setDate(now.getDate() - 30);
         break;
-      case "Last 3 Months":
-        const threeMonthsAgo = new Date(now.setMonth(now.getMonth() - 3));
-        result = result.filter((inquiry) => inquiryDate(inquiry.date) >= threeMonthsAgo);
+      case "Last 90 Days":
+        cutoffDate.setDate(now.getDate() - 90);
         break;
     }
+
+    filtered = filtered.filter(
+      inquiry => new Date(inquiry.created_at) >= cutoffDate
+    );
   }
 
-  // Apply sorting
-  result.sort((a, b) => {
-    switch (sortBy.value) {
-      case "newest":
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-      case "oldest":
-        return new Date(a.date).getTime() - new Date(b.date).getTime();
-      case "status":
-        return a.status.localeCompare(b.status);
-      default:
-        return 0;
-    }
+  // Apply sort
+  filtered.sort((a, b) => {
+    const dateA = new Date(a.created_at).getTime();
+    const dateB = new Date(b.created_at).getTime();
+    return sortBy.value === "newest" ? dateB - dateA : dateA - dateB;
   });
 
-  return result;
+  return filtered;
 });
 
-// Pagination computed properties
-const totalInquiries = computed(() => filteredInquiries.value.length);
-const totalPages = computed(() => Math.ceil(totalInquiries.value / itemsPerPage));
-const paginationStart = computed(() => (currentPage.value - 1) * itemsPerPage + 1);
-const paginationEnd = computed(() => 
-  Math.min(currentPage.value * itemsPerPage, totalInquiries.value)
+// Computed properties for pagination
+const totalPages = computed(() => 
+  Math.ceil(filteredInquiries.value.length / itemsPerPage)
 );
 
 const paginatedInquiries = computed(() => {
@@ -331,30 +343,110 @@ const paginatedInquiries = computed(() => {
   return filteredInquiries.value.slice(start, end);
 });
 
-// Sort options
-const sortOptions = ref([
-  { value: "newest", label: "Newest First", icon: "i-uil-sort-amount-down" },
-  { value: "oldest", label: "Oldest First", icon: "i-uil-sort-amount-up" },
-  { value: "status", label: "By Status", icon: "i-uil-list-ul" },
-]);
+// Fetch inquiries with their status
+const fetchInquiries = async () => {
+  try {
+    isLoading.value = true;
+    
+    // First get all inquiries
+    const { data: inquiriesData, error: inquiriesError } = await supabase
+      .from('inquiries')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (inquiriesError) throw inquiriesError;
 
-// Action handlers
-const handleResolve = (inquiry) => {
-  console.log("Resolve inquiry:", inquiry);
+    // Then get all statuses
+    const { data: statusData, error: statusError } = await supabase
+      .from('inquiry_status')
+      .select('*');
+    
+    if (statusError) throw statusError;
+
+    // Merge inquiries with their status
+    inquiries.value = inquiriesData.map(inquiry => ({
+      ...inquiry,
+      status: statusData.find(s => s.inquiry_id === inquiry.id)?.status || 'Pending'
+    }));
+
+  } catch (error: any) {
+    error(error.message || 'Failed to load inquiries');
+  } finally {
+    isLoading.value = false;
+  }
 };
 
-const handleDelete = (inquiry) => {
-  console.log("Delete inquiry:", inquiry);
+// Handle resolving an inquiry
+const handleResolve = async (inquiry: InquiryWithStatus) => {
+  try {
+    const { error: resolveError } = await supabase
+      .from('inquiry_status')
+      .upsert({
+        inquiry_id: inquiry.id,
+        status: 'Resolved'
+      });
+    
+    if (resolveError) throw resolveError;
+
+    // Update local state
+    const index = inquiries.value.findIndex(i => i.id === inquiry.id);
+    if (index !== -1) {
+      inquiries.value[index] = {
+        ...inquiry,
+        status: 'Resolved'
+      };
+    }
+
+    success('Inquiry marked as resolved');
+  } catch (err) {
+    error(err instanceof Error ? err.message : 'Failed to resolve inquiry');
+  }
 };
 
-// Helper functions
-const clearFilters = () => {
-  selectedStatus.value = "";
-  selectedDateRange.value = "";
+// Handle deleting an inquiry
+const handleDelete = async (inquiry: InquiryWithStatus) => {
+  try {
+    // First delete the status (due to foreign key constraint)
+    const { error: statusError } = await supabase
+      .from('inquiry_status')
+      .delete()
+      .eq('inquiry_id', inquiry.id);
+    
+    if (statusError) throw statusError;
+
+    // Then delete the inquiry
+    const { error: inquiryError } = await supabase
+      .from('inquiries')
+      .delete()
+      .eq('id', inquiry.id);
+    
+    if (inquiryError) throw inquiryError;
+
+    // Update local state
+    inquiries.value = inquiries.value.filter(i => i.id !== inquiry.id);
+
+    success('Inquiry deleted successfully');
+  } catch (error: any) {
+    error(error.message || 'Failed to delete inquiry');
+  }
 };
 
-const selectSortOption = (value) => {
-  sortBy.value = value;
-  isSortMenuOpen.value = false;
-};
+// Click outside handlers
+const filterMenuRef = ref();
+const sortMenuRef = ref();
+
+onClickOutside(filterMenuRef, () => (isFilterMenuOpen.value = false));
+onClickOutside(sortMenuRef, () => (isSortMenuOpen.value = false));
+
+// Add meta information for SEO
+useHead({
+  title: 'Inquiries - Console',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+});
+
+onMounted(() => {
+  fetchInquiries();
+});
 </script>

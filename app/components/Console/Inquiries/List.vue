@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="group border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors"
-  >
+  <div class="group border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors">
     <div class="p-4 sm:p-6">
       <!-- Header Section -->
       <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-3">
@@ -27,12 +25,11 @@
         <div
           class="px-3 py-1 rounded-full text-sm font-medium w-fit"
           :class="{
-            'bg-yellow-50 text-yellow-600': status === 'Pending',
-            'bg-emerald-50 text-emerald-600': status === 'Resolved',
-            'bg-red-50 text-red-600': status === 'Spam',
+            'bg-yellow-50 text-yellow-600': !status || status === 'Pending',
+            'bg-emerald-50 text-emerald-600': status === 'Resolved'
           }"
         >
-          {{ status }}
+          {{ status || 'Pending' }}
         </div>
       </div>
 
@@ -44,20 +41,19 @@
         class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"
       >
         <button
-          v-if="status === 'Pending'"
+          v-if="!status || status === 'Pending'"
           @click="$emit('resolve')"
           class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
         >
           <Icon name="i-uil-check" class="w-4 h-4 flex-shrink-0" />
-          <span class="hidden sm:inline">Mark as Resolved</span>
-          <span class="sm:hidden">Resolve</span>
+          <span>Mark as Resolved</span>
         </button>
         <button
           @click="$emit('delete')"
           class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
         >
           <Icon name="i-uil-trash-alt" class="w-4 h-4 flex-shrink-0" />
-          <span class="hidden sm:inline">Delete</span>
+          <span>Delete</span>
         </button>
       </div>
     </div>
@@ -65,29 +61,33 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import type { Database } from '~/types'
 
-interface Props {
-  id: number;
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  date: string;
-  status: "Pending" | "Resolved" | "Spam";
-}
+type Inquiry = Database['public']['Tables']['inquiries']['Row']
+type InquiryStatus = Database['public']['Enums']['InquiryStatus']
+type InquiryWithStatus = Inquiry & { status?: InquiryStatus }
 
-const props = defineProps<Props>();
-defineEmits(["resolve", "delete"]);
+interface Props extends InquiryWithStatus {}
+
+const props = defineProps<Props>()
+defineEmits(['resolve', 'delete'])
 
 const formattedDate = computed(() => {
-  const date = new Date(props.date);
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-  }).format(date);
-});
+  if (!props.created_at) return ''
+  
+  try {
+    const date = new Date(props.created_at)
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    }).format(date)
+  } catch (error) {
+    console.error('Error formatting date:', error)
+    return props.created_at
+  }
+})
 </script>

@@ -7,7 +7,12 @@ export default defineNuxtConfig({
   },
 
   devtools: { enabled: true },
-  modules: ["@nuxtjs/tailwindcss", "@nuxt/icon", "@pinia/nuxt"],
+  modules: [
+    "@nuxtjs/tailwindcss",
+    "@nuxt/icon",
+    "@pinia/nuxt",
+    "@nuxtjs/supabase",
+  ],
   icon: {
     serverBundle: {
       collections: ["uil"],
@@ -18,4 +23,12 @@ export default defineNuxtConfig({
     cssPath: "~/assets/css/tailwind.css",
     configPath: "~/tailwind.config.ts",
   },
+
+  supabase: {
+    redirectOptions: {
+      login: '/auth/sign-in',
+      callback: '/auth/sign-in',
+      include: ['/console', '/console(/*)?']
+    }
+  }
 });
