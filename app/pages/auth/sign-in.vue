@@ -121,25 +121,41 @@ async function handleSignIn() {
 
   try {
     isLoading.value = true
-    // TODO: Implement sign in logic with Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
       email: form.value.email,
       password: form.value.password,
     });
     
     if (error) {
-      throw error
+      if (error.message.includes('Email not confirmed')) {
+        toastError('Please check your email and confirm your account before signing in')
+      } else {
+        toastError('Invalid email or password')
+      }
+      return
     }
+
+    // Fetch user profile
+    await useAuthStore().fetchUser();
 
     // Redirect to dashboard on success
     navigateTo('/console');
   } catch (error) {
     console.error('Sign in error:', error)
-    toastError('Failed to sign in. Please check your credentials and try again.')
+    toastError('An unexpected error occurred. Please try again later.')
   } finally {
     isLoading.value = false
   }
 }
+
+const user = useSupabaseUser()
+onMounted(() => {
+  watchEffect(() => {
+    if (user.value) {
+      navigateTo('/console')
+    }
+  });
+});
 
 // Add meta information for SEO
 useHead({

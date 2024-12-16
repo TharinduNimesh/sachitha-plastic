@@ -7,7 +7,7 @@
     leave-active-class="transition duration-200 ease-in"
     leave-from-class="transform translate-y-0 opacity-100"
     leave-to-class="transform translate-y-2 opacity-0"
-    class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"
+    class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2"
   >
     <div
       v-for="toast in toasts"

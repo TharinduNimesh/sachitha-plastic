@@ -25,10 +25,15 @@ export default defineNuxtConfig({
   },
 
   supabase: {
-    redirectOptions: {
-      login: '/auth/sign-in',
-      callback: '/auth/sign-in',
-      include: ['/console', '/console(/*)?']
+    redirect: false,
+    cookieOptions: {
+      maxAge: 60 * 60 * 8, // 8 hours
+      secure: true,
+      sameSite: 'lax'
     }
-  }
+  },
+
+  routeRules: {
+    "/console/**": { ssr: false, appMiddleware: ["auth"] },
+  },
 });

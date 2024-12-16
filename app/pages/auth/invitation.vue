@@ -17,6 +17,9 @@ interface FormErrors {
 
 type InvitationState = 'loading' | 'valid' | 'invalid' | 'used'
 
+// Get Supabase client
+const supabase = useSupabaseClient()
+
 // Get invitation ID from query params
 const route = useRoute()
 const invitationId = computed(() => route.query.id as string)
@@ -36,30 +39,44 @@ const invitationData = ref<InvitationData>({
   role: ''
 })
 
-// Simulated API call to fetch invitation data
+// Fetch invitation data from Supabase
 async function fetchInvitationData() {
   try {
     isLoading.value = true
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500))
 
-    // Simulate API response
     if (!invitationId.value) {
       invitationState.value = 'invalid'
       return
     }
 
-    // For demo purposes, simulate different states based on ID
-    if (invitationId.value === 'used') {
-      invitationState.value = 'used'
-    } else if (invitationId.value === 'invalid') {
+    // Get invitation from database
+    const { data: invite, error } = await supabase
+      .from('invites')
+      .select('*')
+      .eq('id', invitationId.value)
+      .single()
+
+    if (error || !invite) {
       invitationState.value = 'invalid'
-    } else {
-      invitationState.value = 'valid'
-      invitationData.value = {
-        email: 'demo@example.com',
-        role: 'Administrator'
-      }
+      return
+    }
+
+    // Check if invitation is used or expired
+    if (invite.is_used) {
+      invitationState.value = 'used'
+      return
+    }
+
+    if (invite.is_expired) {
+      invitationState.value = 'invalid'
+      return
+    }
+
+    // Valid invitation
+    invitationState.value = 'valid'
+    invitationData.value = {
+      email: invite.email,
+      role: invite.role
     }
   } catch (error) {
     console.error('Error fetching invitation:', error)
@@ -93,13 +110,33 @@ async function handleAcceptInvitation() {
 
   try {
     isSubmitting.value = true
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    // Simulate successful invitation acceptance
-    navigateTo('/auth/sign-in')
+
+    // Sign up user with Supabase
+    const { data: authData, error: signUpError } = await supabase.auth.signUp({
+      email: invitationData.value.email,
+      password: form.value.password,
+      options: {
+        data: {
+          role: invitationData.value.role
+        }
+      }
+    })
+
+    if (signUpError) throw signUpError
+
+    // Mark invitation as used
+    const { error: updateError } = await supabase
+      .from('invites')
+      .update({ is_used: true })
+      .eq('id', invitationId.value)
+
+    if (updateError) throw updateError
+
+    // Redirect to sign in
+    await navigateTo('/auth/sign-in')
   } catch (error) {
     console.error('Error accepting invitation:', error)
+    errors.value.password = 'Failed to create account. Please try again.'
   } finally {
     isSubmitting.value = false
   }

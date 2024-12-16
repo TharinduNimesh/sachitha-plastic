@@ -90,21 +90,24 @@ export type Database = {
         Row: {
           created_at: string
           email: string
-          id: number
+          id: string
+          is_expired: boolean
           is_used: boolean
           role: Database["public"]["Enums"]["Role"]
         }
         Insert: {
           created_at?: string
           email: string
-          id?: number
+          id?: string
+          is_expired?: boolean
           is_used?: boolean
           role?: Database["public"]["Enums"]["Role"]
         }
         Update: {
           created_at?: string
           email?: string
-          id?: number
+          id?: string
+          is_expired?: boolean
           is_used?: boolean
           role?: Database["public"]["Enums"]["Role"]
         }
@@ -232,24 +235,32 @@ export type Database = {
           created_at: string
           id: number
           role: Database["public"]["Enums"]["Role"]
-          status: Database["public"]["Enums"]["UserStatus"]
+          status: Database["public"]["Enums"]["UserStatus"] | null
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: number
           role: Database["public"]["Enums"]["Role"]
-          status?: Database["public"]["Enums"]["UserStatus"]
+          status?: Database["public"]["Enums"]["UserStatus"] | null
           user_id?: string
         }
         Update: {
           created_at?: string
           id?: number
           role?: Database["public"]["Enums"]["Role"]
-          status?: Database["public"]["Enums"]["UserStatus"]
+          status?: Database["public"]["Enums"]["UserStatus"] | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_status_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -262,13 +273,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      setup_account: {
+        Args: {
+          email_input: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       Availability: "InStock" | "OutOfStock"
       InquiryStatus: "Pending" | "Resolved"
       ProductStatus: "Active" | "Draft" | "Hidden"
       Role: "Admin" | "Moderator"
-      UserStatus: "Active" | "Pending" | "Suspended" | "Removed"
+      UserStatus: "Active" | "Suspend" | "Removed"
     }
     CompositeTypes: {
       [_ in never]: never

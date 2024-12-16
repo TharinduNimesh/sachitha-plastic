@@ -10,7 +10,7 @@
           </p>
         </div>
         <button
-          @click="showAddMemberModal = true"
+          @click="showNewMemberModal = true"
           class="btn-primary flex items-center space-x-2"
         >
           <Icon name="i-uil-user-plus" class="w-5 h-5" />
@@ -58,7 +58,6 @@
         </div>
       </div>
 
-      <!-- Members Grid -->
       <!-- Members List -->
       <div class="space-y-4">
         <div
@@ -103,7 +102,7 @@
                         {{ member.role }}
                       </span>
                       <span
-                        v-if="member.suspended"
+                        v-if="member.status === 'suspended'"
                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600"
                       >
                         Suspended
@@ -118,7 +117,7 @@
                 class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <button
-                  v-if="!member.suspended"
+                  v-if="member.status !== 'suspended'"
                   @click="suspendMember(member.id)"
                   class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50 rounded-lg transition-colors"
                 >
@@ -145,85 +144,210 @@
           </div>
         </div>
       </div>
+
+      <!-- Pending Invites List -->
+      <div class="space-y-4 mt-5">
+        <h2 v-if="filteredInvites.length > 0" class="text-lg font-bold text-slate-900">Pending Invites</h2>
+        <div
+          v-for="invite in filteredInvites"
+          :key="invite.id"
+          class="group bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+        >
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <!-- Invite Info -->
+              <div class="flex items-center gap-6">
+                <div>
+                  <h3 class="text-lg font-semibold text-slate-900">
+                    {{ invite.email }}
+                  </h3>
+                  <div class="mt-1 flex items-center gap-4">
+                    <p class="text-sm text-slate-600 flex items-center gap-2">
+                      <Icon name="i-uil-envelope" class="w-4 h-4" />
+                      {{ invite.email }}
+                    </p>
+                    <div class="flex items-center gap-2">
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        :class="{
+                          'bg-emerald-50 text-emerald-600':
+                            invite.role === 'Admin',
+                          'bg-blue-50 text-blue-600':
+                            invite.role === 'Moderator',
+                          'bg-slate-50 text-slate-600':
+                            invite.role === 'Member',
+                        }"
+                      >
+                        {{ invite.role }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div
+                class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <button
+                  @click="removeInvite(invite.id)"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <Icon name="i-uil-trash-alt" class="w-4 h-4" />
+                  <span class="hidden sm:inline">Cancel</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <CommonModalNewMemberModal
+        v-model="showNewMemberModal"
+        @invited="handleMemberInvited"
+      />
     </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-
 // Member data
 interface Member {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: string;
-  suspended?: boolean;
+  status?: string;
+  created_at: string;
 }
 
-const members = ref<Member[]>([
-  {
-    id: 1,
-    name: "Admin User",
-    email: "admin@example.com",
-    role: "Admin",
-  },
-  {
-    id: 2,
-    name: "Moderator User",
-    email: "mod@example.com",
-    role: "Moderator",
-  },
-  {
-    id: 3,
-    name: "Regular User",
-    email: "user@example.com",
-    role: "Member",
-    suspended: true,
-  },
-]);
+interface PendingInvite {
+  id: number;
+  email: string;
+  role: string;
+  created_at: string;
+}
+
+const showNewMemberModal = ref(false);
+const members = ref<Member[]>([]);
+const pendingInvites = ref<PendingInvite[]>([]);
+const isLoading = ref(true);
 
 // Search and filter
 const searchQuery = ref("");
 const selectedRole = ref("");
-const showAddMemberModal = ref(false);
-const roles = ["Admin", "Moderator", "Member"];
+const roles = ["Admin", "Moderator"];
 
+// Load members and pending invites
+const loadMembersAndInvites = async () => {
+  try {
+    isLoading.value = true;
+    const supabase = useSupabaseClient();
+
+    // Load members with their status in separate queries
+    const { data: membersData, error: membersError } = await supabase
+      .from("profiles")
+      .select(`
+        *,
+        user_status (
+          role,
+          status
+        )
+      `);
+
+    if (membersError) throw membersError;
+
+    console.log(membersData[0]);
+    // Format members data
+    members.value = membersData.map(member => ({
+      id: member.id,
+      name: member.name || 'Unknown',
+      email: member.email,
+      role: member.user_status?.role || 'Member',
+      status: member.user_status?.status,
+      created_at: member.created_at
+    }));
+
+    // Load pending invites
+    const { data: invitesData, error: invitesError } = await supabase
+      .from("invites")
+      .select("*")
+      .eq("is_used", false);
+
+    if (invitesError) throw invitesError;
+
+    // Format pending invites data
+    pendingInvites.value = invitesData.map(invite => ({
+      id: invite.id,
+      email: invite.email,
+      role: invite.role,
+      created_at: invite.created_at
+    }));
+
+  } catch (error) {
+    console.error("Error loading members and invites:", error);
+    const toast = useToast();
+    toast.error("Failed to load members and invites");
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Filter members and invites
 const filteredMembers = computed(() => {
-  return members.value.filter((member) => {
-    const matchesSearch =
-      !searchQuery.value ||
-      member.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      member.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      member.role.toLowerCase().includes(searchQuery.value.toLowerCase());
+  let result = [...members.value];
 
-    const matchesRole =
-      !selectedRole.value || member.role === selectedRole.value;
+  // Apply search filter
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase();
+    result = result.filter(
+      (member) =>
+        member.name.toLowerCase().includes(query) ||
+        member.email.toLowerCase().includes(query)
+    );
+  }
 
-    return matchesSearch && matchesRole;
-  });
+  // Apply role filter
+  if (selectedRole.value) {
+    result = result.filter(
+      (member) => member.role === selectedRole.value
+    );
+  }
+
+  return result;
+});
+
+const filteredInvites = computed(() => {
+  if (!searchQuery.value.trim()) return pendingInvites.value;
+
+  const query = searchQuery.value.toLowerCase();
+  return pendingInvites.value.filter(
+    (invite) => invite.email.toLowerCase().includes(query)
+  );
 });
 
 // Action handlers
-const removeMember = (id: number) => {
-  members.value = members.value.filter((member) => member.id !== id);
-};
-
-const suspendMember = (id: number) => {
-  const member = members.value.find((m) => m.id === id);
-  if (member) {
-    member.suspended = true;
-  }
-};
-
-const reactivateMember = (id: number) => {
-  const member = members.value.find((m) => m.id === id);
-  if (member) {
-    member.suspended = false;
-  }
+const handleMemberInvited = () => {
+  loadMembersAndInvites();
 };
 
 const toggleRoleFilter = (role: string) => {
   selectedRole.value = selectedRole.value === role ? "" : role;
 };
+
+const removeInvite = async (inviteId: number) => {
+  try {
+    const supabase = useSupabaseClient();
+    await supabase.from("invites").delete().eq("id", inviteId);
+    loadMembersAndInvites();
+  } catch (error) {
+    console.error("Error removing invite:", error);
+    const toast = useToast();
+    toast.error("Failed to remove invite");
+  }
+};
+
+// Load data on mount
+onMounted(() => {
+  loadMembersAndInvites();
+});
 </script>

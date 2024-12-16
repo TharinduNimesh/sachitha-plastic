@@ -217,6 +217,7 @@
           </div>
         </div>
       </div>
+      <CommonModalSetupProfileModal v-if="isAccountSetupped" />
     </div>
   </NuxtLayout>
 </template>
@@ -329,6 +330,10 @@ const notifications = ref([
     read: true,
   },
 ]);
+
+const isAccountSetupped = computed(() => {
+  return !useAuthStore().name;
+});
 
 definePageMeta({
   layout: "console",
