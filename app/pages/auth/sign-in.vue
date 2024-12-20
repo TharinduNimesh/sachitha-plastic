@@ -121,6 +121,13 @@ async function handleSignIn() {
 
   try {
     isLoading.value = true
+
+    const { data: ValidateDate } = await supabase.rpc("is_suspended_or_removed_user", { email_input: form.value.email });
+    if (ValidateDate) {
+      toastError('Your account has been suspended or removed. Please contact support for more information.')
+      return
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email: form.value.email,
       password: form.value.password,

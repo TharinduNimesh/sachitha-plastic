@@ -273,6 +273,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_suspended_or_removed_user: {
+        Args: {
+          email_input: string
+        }
+        Returns: boolean
+      }
       setup_account: {
         Args: {
           email_input: string

@@ -10,7 +10,7 @@
         :class="{ 'bg-gray-200': editor.isActive('bold') }"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
       >
-        <Icon name="uil:bold" class="w-4 h-4" />
+        <Icon name="mdi:format-bold" class="w-4 h-4" />
       </button>
 
       <button
@@ -18,14 +18,14 @@
         :class="{ 'bg-gray-200': editor.isActive('italic') }"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
       >
-        <Icon name="uil:italic" class="w-4 h-4" />
+        <Icon name="mdi:format-italic" class="w-4 h-4" />
       </button>
 
       <button
         @click="editor.chain().focus().setHorizontalRule().run()"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
       >
-        <Icon name="uil:minus" class="w-4 h-4" />
+        <Icon name="mdi:minus" class="w-4 h-4" />
       </button>
 
       <button
@@ -33,7 +33,7 @@
         :class="{ 'bg-gray-200': editor.isActive('underline') }"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
       >
-        <Icon name="uil:underline" class="w-4 h-4" />
+        <Icon name="mdi:format-underline" class="w-4 h-4" />
       </button>
 
       <button
@@ -41,7 +41,7 @@
         :class="{ 'bg-gray-200': editor.isActive('textStyle') }"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
       >
-        <Icon name="uil:palette" class="w-4 h-4" />
+        <Icon name="mdi:palette" class="w-4 h-4" />
       </button>
 
       <button
@@ -49,7 +49,7 @@
         :class="{ 'bg-gray-200': editor.isActive('highlight') }"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
       >
-        <Icon name="uil:highlighter" class="w-4 h-4" />
+        <Icon name="mdi:marker" class="w-4 h-4" />
       </button>
 
       <!-- Heading Menu -->
@@ -59,7 +59,7 @@
           :class="{ 'bg-gray-200': editor.isActive('heading') }"
           class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
         >
-          <Icon name="uil:heading" class="w-4 h-4" />
+          <Icon name="mdi:format-header-1" class="w-4 h-4" />
         </button>
         <!-- Heading dropdown menu -->
         <div
@@ -83,7 +83,7 @@
         :class="{ 'bg-gray-200': editor.isActive('blockquote') }"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
       >
-        <Icon name="uil:quote-alt" class="w-4 h-4" />
+        <Icon name="mdi:format-quote-close" class="w-4 h-4" />
       </button>
 
       <button
@@ -91,7 +91,7 @@
         :class="{ 'bg-gray-200': editor.isActive('bulletList') }"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
       >
-        <Icon name="uil:list-ul" class="w-4 h-4" />
+        <Icon name="mdi:format-list-bulleted" class="w-4 h-4" />
       </button>
 
       <button
@@ -99,7 +99,7 @@
         :class="{ 'bg-gray-200': editor.isActive('orderedList') }"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
       >
-        <Icon name="uil:list-ol" class="w-4 h-4" />
+        <Icon name="mdi:format-list-numbered" class="w-4 h-4" />
       </button>
 
       <!-- Alignment -->
@@ -108,21 +108,21 @@
         :class="{ 'bg-gray-200': editor.isActive({ textAlign: 'left' }) }"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
       >
-        <Icon name="uil:align-left" class="w-4 h-4" />
+        <Icon name="mdi:format-align-left" class="w-4 h-4" />
       </button>
       <button
         @click="editor.chain().focus().setTextAlign('center').run()"
         :class="{ 'bg-gray-200': editor.isActive({ textAlign: 'center' }) }"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
       >
-        <Icon name="uil:align-center" class="w-4 h-4" />
+        <Icon name="mdi:format-align-center" class="w-4 h-4" />
       </button>
       <button
         @click="editor.chain().focus().setTextAlign('right').run()"
         :class="{ 'bg-gray-200': editor.isActive({ textAlign: 'right' }) }"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
       >
-        <Icon name="uil:align-right" class="w-4 h-4" />
+        <Icon name="mdi:format-align-right" class="w-4 h-4" />
       </button>
 
       <!-- Undo/Redo -->
@@ -131,14 +131,14 @@
         :disabled="!editor.can().undo()"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors disabled:opacity-50"
       >
-        <Icon name="uil:undo" class="w-4 h-4" />
+        <Icon name="mdi:undo" class="w-4 h-4" />
       </button>
       <button
         @click="editor.chain().focus().redo().run()"
         :disabled="!editor.can().redo()"
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors disabled:opacity-50"
       >
-        <Icon name="uil:redo" class="w-4 h-4" />
+        <Icon name="mdi:redo" class="w-4 h-4" />
       </button>
 
       <input
