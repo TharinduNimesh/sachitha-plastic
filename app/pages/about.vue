@@ -32,30 +32,6 @@
     <!-- About Us Section component -->
     <WebAbout />
 
-    <!-- Our partnership companies team section component -->
-    <section class="py-16 bg-gray-100">
-      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-2xl font-bold text-center mb-8">Our Quarters</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-            <img src="/images/logo.webp" alt="Samarasinghe Trade Center" class="h-24 w-auto mx-auto mb-4" />
-            <h3 class="text-xl font-semibold">Samarasinghe Trade Center</h3>
-            <p>Our main office oversees strategic planning, customer service, and operational management, driving innovation and quality in everything we do.</p>
-          </div>
-          <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-            <img src="/images/sd-industries.webp" alt="SD Industries" class="h-24 w-auto mx-auto mb-4" />
-            <h3 class="text-xl font-semibold">SD Industries</h3>
-            <p>Focused on supporting the plastic manufacturing process with innovative solutions and essential industry resources.</p>
-          </div>
-          <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-            <img src="/images/sachitha-plastic-manufacture.webp" alt="Sachitha Plastic Manufacture" class="h-24 w-auto mx-auto mb-4" />
-            <h3 class="text-xl font-semibold">Sachitha Plastic Manufacture</h3>
-            <p>A subsidiary specializing in high-quality plastic production, combining advanced techniques with eco-friendly practices.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- Company Overview Section -->
     <section class="py-16 bg-gradient-to-b from-emerald-50 to-white">
       <div class="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -235,6 +211,30 @@
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Our partnership companies team section component -->
+    <section class="py-16 bg-white">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-center mb-8">Our Quarters</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+            <img src="/images/logo.png" alt="Samarasinghe Trade Center" class="h-24 w-auto mx-auto mb-4" />
+            <h3 class="text-xl font-semibold">Samarasinghe Trade Center</h3>
+            <p>Our main office oversees strategic planning, customer service, and operational management, driving innovation and quality in everything we do.</p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+            <img src="/images/sd-industries.webp" alt="SD Industries" class="h-24 w-auto mx-auto mb-4" />
+            <h3 class="text-xl font-semibold">SD Industries</h3>
+            <p>Focused on supporting the plastic manufacturing process with innovative solutions and essential industry resources.</p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+            <img src="/images/sachitha-plastic-manufacture.webp" alt="Sachitha Plastic Manufacture" class="h-24 w-auto mx-auto mb-4" />
+            <h3 class="text-xl font-semibold">Sachitha Plastic Manufacture</h3>
+            <p>A subsidiary specializing in high-quality plastic production, combining advanced techniques with eco-friendly practices.</p>
           </div>
         </div>
       </div>

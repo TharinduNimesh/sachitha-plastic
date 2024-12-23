@@ -117,9 +117,8 @@
                       class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                     >
                       <option value="">All Status</option>
-                      <option>Active</option>
-                      <option>Draft</option>
-                      <option>Archived</option>
+                      <option value="Active">Active</option>
+                      <option value="Hidden">Archived</option>
                     </select>
                   </div>
                 </div>
@@ -162,85 +161,163 @@
       </div>
 
       <!-- Products Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-if="loading" class="flex items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+      </div>
+
+      <div v-else-if="error" class="p-4 bg-red-50 text-red-600 rounded-xl">
+        {{ error }}
+      </div>
+
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <ConsoleProductsCard
-          v-for="product in products"
+          v-for="product in filteredProducts"
           :key="product.id"
-          v-bind="product"
+          :id="product.id"
+          :title="product.name"
+          :category="product.category.name"
+          :status="product.status === 'Hidden' ? 'Archived' : product.status"
+          :image="product.primary_image || ''"
           @edit="handleEdit(product)"
           @preview="handlePreview(product)"
-          @delete="handleDelete(product)"
+          @archive="handleDelete(product)"
+          @toggle-status="toggleStatus(product)"
         />
       </div>
     </div>
+    
+    <!-- Add Confirmation Modal -->
+    <CommonConfirmModal
+      v-model="showConfirmModal"
+      title="Archive Product"
+      :message="confirmMessage"
+      confirm-label="Archive"
+      @confirm="confirmArchive"
+    />
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { onClickOutside } from '@vueuse/core';
+import { ref, computed, onMounted } from 'vue'
+import { onClickOutside } from '@vueuse/core'
+import type { Database } from '~/types/database.types'
 
-// Sample products data
-const products = ref([
-  {
-    id: 1,
-    title: 'Recycling Machine',
-    category: 'Machinery',
-    status: 'Active',
-    image: 'https://5.imimg.com/data5/SELLER/Default/2023/9/347707470/VD/KJ/VV/27965550/plastic-waste-recycling-machine.jpg'
-  },
-  {
-    id: 2,
-    title: 'Storage Box Set',
-    category: 'Household',
-    status: 'Active',
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjxLMTE9gHymaANt4Btb9Ubn_u15SIyo_BSA&s'
-  },
-  {
-    id: 3,
-    title: 'Industrial Pallet',
-    category: 'Industrial',
-    status: 'Draft',
-    image: 'https://cdn.webshopapp.com/shops/31781/files/452353570/industrial-plastic-pallet-1200x1000x150-mm-3-runne.jpg'
-  }
-]);
+type Product = Database['public']['Tables']['products']['Row'] & {
+  category: Database['public']['Tables']['categories']['Row']
+}
+
+// Replace dummy products with real data
+const { fetchProducts, updateProduct, loading, error } = useProducts()
+const products = ref<Product[]>([])
+
+// Fetch products on mount
+onMounted(async () => {
+  products.value = await fetchProducts()
+})
 
 // Refs for click outside detection
-const filterMenuRef = ref<HTMLElement | null>(null);
-const sortMenuRef = ref<HTMLElement | null>(null);
+const filterMenuRef = ref<HTMLElement | null>(null)
+const sortMenuRef = ref<HTMLElement | null>(null)
 
 // State
-const searchQuery = ref('');
-const selectedCategory = ref('');
-const selectedStatus = ref('');
-const sortBy = ref('newest');
-const isFilterMenuOpen = ref(false);
-const isSortMenuOpen = ref(false);
+const searchQuery = ref('')
+const selectedCategory = ref('')
+const selectedStatus = ref('')
+const sortBy = ref('newest')
+const isFilterMenuOpen = ref(false)
+const isSortMenuOpen = ref(false)
 
 // Click outside handlers
 onClickOutside(filterMenuRef, () => {
-  isFilterMenuOpen.value = false;
-});
+  isFilterMenuOpen.value = false
+})
 
 onClickOutside(sortMenuRef, () => {
-  isSortMenuOpen.value = false;
-});
+  isSortMenuOpen.value = false
+})
 
 // Computed properties
-const hasActiveFilters = computed(() => selectedCategory.value || selectedStatus.value);
+const hasActiveFilters = computed(() => selectedCategory.value || selectedStatus.value)
 
-// Action handlers
-const handleEdit = (product) => {
-  console.log('Edit product:', product);
-};
+// Modified computed property to work with real data
+const filteredProducts = computed(() => {
+  let filtered = [...products.value]
+  
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(product => 
+      product.name.toLowerCase().includes(query) ||
+      product.category.name.toLowerCase().includes(query) ||
+      product.status.toLowerCase().includes(query)
+    )
+  }
 
-const handlePreview = (product) => {
-  console.log('Preview product:', product);
-};
+  if (selectedCategory.value) {
+    filtered = filtered.filter(product => 
+      product.category.name === selectedCategory.value
+    )
+  }
 
-const handleDelete = (product) => {
-  console.log('Delete product:', product);
-};
+  if (selectedStatus.value) {
+    filtered = filtered.filter(product => 
+      product.status === selectedStatus.value
+    )
+  }
+
+  // Sort products
+  switch (sortBy.value) {
+    case 'newest':
+      filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      break
+    case 'oldest':
+      filtered.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      break
+    case 'name':
+      filtered.sort((a, b) => a.name.localeCompare(b.name))
+      break
+    case 'name-desc':
+      filtered.sort((a, b) => b.name.localeCompare(a.name))
+      break
+  }
+
+  return filtered
+})
+
+const handlePreview = (product: Product) => {
+  console.log('Preview product:', product)
+}
+
+const { success, error: toastError } = useToast()
+
+// Add state for confirmation modal
+const showConfirmModal = ref(false)
+const productToArchive = ref<Product | null>(null)
+const confirmMessage = computed(() => 
+  productToArchive.value 
+    ? `Are you sure you want to archive "${productToArchive.value.name}"? This will hide the product from the website.`
+    : ''
+)
+
+const handleDelete = (product: Product) => {
+  productToArchive.value = product
+  showConfirmModal.value = true
+}
+
+const confirmArchive = async () => {
+  if (!productToArchive.value) return
+
+  const { success: isSuccess } = await updateProduct(productToArchive.value.id, {
+    status: 'Hidden'
+  })
+
+  if (isSuccess) {
+    success(`${productToArchive.value.name} has been archived successfully.`)
+  } else {
+    toastError('Failed to archive product. Please try again.')
+  }
+
+  productToArchive.value = null
+}
 
 // Sort options
 const sortOptions = ref([
@@ -248,17 +325,35 @@ const sortOptions = ref([
   { value: 'oldest', label: 'Oldest First', icon: 'i-uil-clock' },
   { value: 'name', label: 'Name A-Z', icon: 'i-uil-sort-alpha-down' },
   { value: 'name-desc', label: 'Name Z-A', icon: 'i-uil-sort-alpha-up-alt' },
-]);
+])
 
 // Clear filters
 const clearFilters = () => {
-  selectedCategory.value = '';
-  selectedStatus.value = '';
-};
+  selectedCategory.value = ''
+  selectedStatus.value = ''
+}
 
 // Select sort option
-const selectSortOption = (value) => {
-  sortBy.value = value;
-  isSortMenuOpen.value = false;
-};
+const selectSortOption = (value: string) => {
+  sortBy.value = value
+  isSortMenuOpen.value = false
+}
+
+// Add status toggle function
+const toggleStatus = async (product: Product) => {
+  const newStatus = product.status === 'Active' ? 'Hidden' : 'Active'
+  const { success: isSuccess } = await updateProduct(product.id, {
+    status: newStatus
+  })
+
+  if (isSuccess) {
+    // Update the product in the local state
+    products.value = products.value.map(p => 
+      p.id === product.id ? { ...p, status: newStatus } : p
+    )
+    success(`Product ${newStatus === 'Active' ? 'activated' : 'archived'} successfully.`)
+  } else {
+    toastError('Failed to update product status. Please try again.')
+  }
+}
 </script>

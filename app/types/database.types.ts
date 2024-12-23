@@ -179,7 +179,9 @@ export type Database = {
           description: string
           id: number
           name: string
+          primary_image: string | null
           status: Database["public"]["Enums"]["ProductStatus"]
+          updated_at: string | null
         }
         Insert: {
           availability?: Database["public"]["Enums"]["Availability"]
@@ -188,7 +190,9 @@ export type Database = {
           description: string
           id?: number
           name: string
+          primary_image?: string | null
           status?: Database["public"]["Enums"]["ProductStatus"]
+          updated_at?: string | null
         }
         Update: {
           availability?: Database["public"]["Enums"]["Availability"]
@@ -197,7 +201,9 @@ export type Database = {
           description?: string
           id?: number
           name?: string
+          primary_image?: string | null
           status?: Database["public"]["Enums"]["ProductStatus"]
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -268,6 +274,12 @@ export type Database = {
     }
     Functions: {
       is_admin_user: {
+        Args: {
+          user_id_input: string
+        }
+        Returns: boolean
+      }
+      is_moderator_user: {
         Args: {
           user_id_input: string
         }

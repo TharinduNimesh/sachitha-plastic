@@ -3,7 +3,7 @@
     <!-- Product Image with Overlay -->
     <div class="aspect-[4/3] relative bg-slate-50 overflow-hidden">
       <img
-        :src="image"
+        :src="`${$config.public.supabase.url}/storage/v1/object/public/product_images/${image}`"
         :alt="title"
         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
       />
@@ -15,7 +15,7 @@
             'px-3 py-1.5 text-xs font-medium rounded-full shadow-sm',
             status === 'Active' 
               ? 'bg-emerald-500 text-white ring-2 ring-emerald-500/20'
-              : 'bg-slate-500 text-white ring-2 ring-slate-500/20',
+              : 'bg-orange-500 text-white ring-2 ring-orange-500/20',
           ]"
         >
           {{ status }}
@@ -29,7 +29,7 @@
           <div class="flex items-center justify-center gap-3">
             <button 
               class="relative flex items-center gap-2 px-4 py-2.5 bg-white/95 text-slate-700 rounded-xl shadow-lg hover:bg-emerald-500 hover:text-white transition-all duration-300 group/btn"
-              @click="$emit('edit')"
+              @click="navigateTo(`/console/products/${id}?editable=true`)"
             >
               <Icon name="i-uil-edit" class="w-5 h-5" />
               <span class="text-sm font-medium">Edit</span>
@@ -37,18 +37,18 @@
             </button>
             <button 
               class="relative flex items-center gap-2 px-4 py-2.5 bg-white/95 text-slate-700 rounded-xl shadow-lg hover:bg-emerald-500 hover:text-white transition-all duration-300 group/btn"
-              @click="$emit('preview')"
+              @click="navigateTo(`/console/products/${id}`)"
             >
               <Icon name="i-uil-eye" class="w-5 h-5" />
               <span class="text-sm font-medium">Preview</span>
               <span class="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></span>
             </button>
             <button 
-              class="relative flex items-center gap-2 px-4 py-2.5 bg-white/95 text-slate-700 rounded-xl shadow-lg hover:bg-red-500 hover:text-white transition-all duration-300 group/btn"
-              @click="$emit('delete')"
+              class="relative flex items-center gap-2 px-4 py-2.5 bg-white/95 text-slate-700 rounded-xl shadow-lg hover:bg-orange-500 hover:text-white transition-all duration-300 group/btn"
+              @click="$emit('toggle-status')"
             >
-              <Icon name="i-uil-trash-alt" class="w-5 h-5" />
-              <span class="text-sm font-medium">Delete</span>
+              <Icon :name="status === 'Active' ? 'i-uil-archive' : 'i-uil-history'" class="w-5 h-5" />
+              <span class="text-sm font-medium">{{ status === 'Active' ? 'Archive' : 'Activate' }}</span>
               <span class="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></span>
             </button>
           </div>
@@ -61,7 +61,7 @@
       <!-- Category -->
       <div class="flex items-center space-x-2">
         <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-sm font-medium">
-          <Icon :name="categoryIcon" class="w-4 h-4 mr-1.5" />
+          <Icon :name="categoryIcon || ''" class="w-4 h-4 mr-1.5" />
           {{ category }}
         </span>
       </div>
@@ -91,6 +91,7 @@
 
 <script setup lang="ts">
 interface Props {
+  id: number; // Add id to props
   title: string;
   category: string;
   status: string;
@@ -98,19 +99,25 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const router = useRouter();
 
-// Emit events for actions
-defineEmits(['edit', 'preview', 'delete']);
+// Navigation helper
+const navigateTo = (path: string) => {
+  router.push(path);
+};
+
+// Emit only toggle-status event now
+defineEmits(['toggle-status']);
 
 // Compute category icon based on category
 const categoryIcon = computed(() => {
-  const icons = {
+  const icons: Record<string, string> = {
     'Machinery': 'i-uil-processor',
     'Household': 'i-uil-home',
     'Industrial': 'i-uil-building',
     'default': 'i-uil-box'
   };
-  return icons[props.category] || icons.default;
+  return icons[props.category as keyof typeof icons] || icons.default;
 });
 
 // Sample product images (you can replace these with your actual images)

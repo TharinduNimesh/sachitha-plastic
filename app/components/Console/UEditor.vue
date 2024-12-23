@@ -64,17 +64,19 @@
         <!-- Heading dropdown menu -->
         <div
           v-if="isHeadingMenuOpen"
-          class="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-slate-200 p-2 grid grid-cols-3 gap-1 z-10"
+          class="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-slate-200 p-3 z-10 min-w-[200px]"
         >
-          <button
-            v-for="level in [1, 2, 3, 4, 5, 6]"
-            :key="level"
-            @click="editor.chain().focus().toggleHeading({ level }).run(); isHeadingMenuOpen = false"
-            :class="{ 'bg-gray-200': editor.isActive('heading', { level }) }"
-            class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
-          >
-            <span class="text-sm font-medium">H{{ level }}</span>
-          </button>
+          <div class="grid grid-cols-3 gap-2">
+        <button
+          v-for="level in [1, 2, 3, 4, 5, 6]"
+          :key="level"
+          @click="editor.chain().focus().toggleHeading({ level }).run(); isHeadingMenuOpen = false"
+          :class="{ 'bg-gray-200': editor.isActive('heading', { level }) }"
+          class="w-12 h-12 flex items-center justify-center rounded border border-slate-200 hover:bg-gray-200 transition-colors"
+        >
+          <span class="text-sm font-semibold">H{{ level }}</span>
+        </button>
+          </div>
         </div>
       </div>
 
@@ -155,13 +157,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-useHead({
-  script: [
-    {
-      src: "https://unpkg.com/@tiptap/core@2.0.0-beta.209/dist/tiptap-core.umd.js",
-    },
-  ],
-});
+
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
@@ -196,7 +192,7 @@ const editor = useEditor({
   editorProps: {
     attributes: {
       class:
-        "h-[400px] border border-slate-300 bg-gray-50 p-5 border-t-none rounded-bl-lg rounded-br-lg outline-none overflow-y-auto",
+        "w-full prose prose-sm max-w-none h-[400px] border border-slate-300 bg-gray-50 p-5 border-t-none rounded-bl-lg rounded-br-lg outline-none overflow-y-auto",
     },
   },
   content: props.modelValue,

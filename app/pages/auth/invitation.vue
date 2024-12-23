@@ -162,7 +162,7 @@ useHead({
       <!-- Header -->
       <div class="text-center">
         <NuxtLink to="/" class="flex items-center justify-center space-x-3 mb-8">
-          <img src="/images/logo.webp" alt="Logo" class="h-12 w-auto" />
+          <img src="/images/logo.png" alt="Logo" class="h-12 w-auto" />
           <div class="flex flex-col">
             <span class="text-xl font-bold leading-tight text-slate-900 uppercase">Samarasinghe</span>
             <span class="text-sm text-slate-600 font-semibold -mt-1 uppercase">Trade Center</span>

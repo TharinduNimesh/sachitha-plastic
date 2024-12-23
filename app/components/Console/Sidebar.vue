@@ -17,7 +17,7 @@
           class="flex items-center"
           :class="{ 'justify-center': sidebarStore.isCollapsed }"
         >
-          <img src="/images/logo.webp" alt="Logo" class="h-8 w-auto" />
+          <img src="/images/logo.png" alt="Logo" class="h-8 w-auto" />
           <div v-if="!sidebarStore.isCollapsed" class="flex flex-col ml-3">
             <span class="text-lg font-bold text-slate-900">Veselty Inc.</span>
             <span class="text-sm text-slate-500">Free Plan</span>
