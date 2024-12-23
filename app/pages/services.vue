@@ -6,24 +6,27 @@
         <div class="blob-1"></div>
         <div class="blob-2"></div>
       </div>
-      
+
       <!-- Hero Content -->
       <div class="relative container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12 space-y-4">
-          <span class="inline-block px-4 py-1 bg-emerald-100 text-emerald-600 rounded-full text-sm font-medium transition-all hover:bg-emerald-200">
+          <span
+            class="inline-block px-4 py-1 bg-emerald-100 text-emerald-600 rounded-full text-sm font-medium transition-all hover:bg-emerald-200"
+          >
             Our Services
           </span>
-          <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4 transition-all">
+          <h1
+            class="text-4xl md:text-5xl font-bold text-slate-900 mb-4 transition-all"
+          >
             Professional Services
           </h1>
           <p class="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            We offer comprehensive services in plastic recycling, machinery maintenance, and consulting to help your business thrive.
+            We offer comprehensive services in plastic recycling, machinery
+            maintenance, and consulting to help your business thrive.
           </p>
         </div>
       </div>
     </div>
-
-    
 
     <!-- Services Grid Section -->
     <section class="py-16 bg-gradient-to-b from-emerald-50 to-white">
@@ -33,131 +36,230 @@
           <h2 class="text-3xl font-bold text-slate-900">Our Services</h2>
           <div class="w-20 h-1 bg-emerald-500 mx-auto mt-4 rounded-full"></div>
           <p class="mt-4 text-slate-600 max-w-2xl mx-auto">
-            Discover our comprehensive range of sustainable solutions and expert services
+            Discover our comprehensive range of sustainable solutions and expert
+            services
           </p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <!-- Eco-Friendly Products Card -->
-          <div class="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1">
-            <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+          <div
+            class="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
+          >
+            <div
+              class="absolute top-0 left-0 w-full h-1 bg-emerald-500 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+            ></div>
             <div class="relative h-64 overflow-hidden">
-              <img 
-                src="/images/services/echo-friendly.jpg" 
-                alt="Eco-Friendly Products" 
+              <img
+                src="/images/services/echo-friendly.jpg"
+                alt="Eco-Friendly Products"
                 class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              >
                 <div class="absolute bottom-0 left-0 right-0 p-6">
-                  <p class="text-white text-lg font-medium">Sustainable Solutions for a Better Future</p>
+                  <p class="text-white text-lg font-medium">
+                    Sustainable Solutions for a Better Future
+                  </p>
                 </div>
               </div>
             </div>
             <div class="p-8">
               <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                  <Icon name="mingcute:recycle-line" class="w-6 h-6 text-emerald-600" />
+                <div
+                  class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center"
+                >
+                  <Icon
+                    name="mingcute:recycle-line"
+                    class="w-6 h-6 text-emerald-600"
+                  />
                 </div>
-                <h3 class="text-2xl font-bold text-slate-900">Eco-Friendly Products</h3>
+                <h3 class="text-2xl font-bold text-slate-900">
+                  Product Manufacturing
+                </h3>
               </div>
               <p class="text-slate-600 mb-6 leading-relaxed">
-                Sustainable plastic solutions that prioritize environmental responsibility while maintaining high quality and performance.
+                We cater to the Sri Lankan market with a comprehensive range of
+                plastic products
               </p>
               <ul class="space-y-3">
                 <li class="flex items-center gap-3">
-                  <Icon name="uil:check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                  <span class="text-slate-600">Biodegradable packaging solutions</span>
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
+                  <span class="text-slate-600"
+                    >Stools, kitchenware, home & office organisers, basins,
+                    cleaning items, and dustbins.</span
+                  >
                 </li>
                 <li class="flex items-center gap-3">
-                  <Icon name="uil:check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                  <span class="text-slate-600">Recycled plastic materials</span>
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
+                  <span class="text-slate-600"
+                    >Modern and stylish designs for various needs.</span
+                  >
                 </li>
                 <li class="flex items-center gap-3">
-                  <Icon name="uil:check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                  <span class="text-slate-600">Sustainable product designs</span>
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
+                  <span class="text-slate-600">High-quality flower pots.</span>
+                </li>
+                <li class="flex items-center gap-3">
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
+                  <span class="text-slate-600"
+                    >Educational and children’s toys designed to inspire and
+                    educate.</span
+                  >
                 </li>
               </ul>
             </div>
           </div>
 
           <!-- Recycling Machinery Card -->
-          <div class="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1">
-            <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+          <div
+            class="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
+          >
+            <div
+              class="absolute top-0 left-0 w-full h-1 bg-emerald-500 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+            ></div>
             <div class="relative h-64 overflow-hidden">
-              <img 
-                src="/images/services/recycling-machinery.jpg" 
-                alt="Recycling Machinery" 
+              <img
+                src="/images/services/recycling-machinery.jpg"
+                alt="Recycling Machinery"
                 class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              >
                 <div class="absolute bottom-0 left-0 right-0 p-6">
-                  <p class="text-white text-lg font-medium">State-of-the-Art Equipment</p>
+                  <p class="text-white text-lg font-medium">
+                    State-of-the-Art Equipment
+                  </p>
                 </div>
               </div>
             </div>
             <div class="p-8">
               <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                  <Icon name="mdi:state-machine" class="w-6 h-6 text-emerald-600" />
+                <div
+                  class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center"
+                >
+                  <Icon
+                    name="mdi:state-machine"
+                    class="w-6 h-6 text-emerald-600"
+                  />
                 </div>
-                <h3 class="text-2xl font-bold text-slate-900">Recycling Machinery</h3>
+                <h3 class="text-2xl font-bold text-slate-900">
+                  Customized Manufacturing
+                </h3>
               </div>
               <p class="text-slate-600 mb-6 leading-relaxed">
-                State-of-the-art equipment and machinery for efficient plastic recycling operations and waste management.
+                We offer tailored plastic manufacturing solutions for local and
+                international partners.meeting specific requirements with
+                precision and efficiency
               </p>
               <ul class="space-y-3">
                 <li class="flex items-center gap-3">
-                  <Icon name="uil:check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                  <span class="text-slate-600">Advanced sorting systems</span>
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
+                  <span class="text-slate-600">Recycling Machines</span>
                 </li>
                 <li class="flex items-center gap-3">
-                  <Icon name="uil:check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                  <span class="text-slate-600">Processing equipment</span>
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
+                  <span class="text-slate-600">Mould Accessories & Tools</span>
                 </li>
                 <li class="flex items-center gap-3">
-                  <Icon name="uil:check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                  <span class="text-slate-600">Maintenance services</span>
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
+                  <span class="text-slate-600">Raw Materials</span>
+                </li>
+                <li class="flex items-center gap-3">
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
+                  <span class="text-slate-600">Industry Chemicals</span>
                 </li>
               </ul>
             </div>
           </div>
 
           <!-- Expert Support Card -->
-          <div class="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1">
-            <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+          <div
+            class="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
+          >
+            <div
+              class="absolute top-0 left-0 w-full h-1 bg-emerald-500 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+            ></div>
             <div class="relative h-64 overflow-hidden">
-              <img 
-                src="/images/services/expert-support.jpg" 
-                alt="Expert Support" 
+              <img
+                src="/images/services/expert-support.jpg"
+                alt="Expert Support"
                 class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              >
                 <div class="absolute bottom-0 left-0 right-0 p-6">
-                  <p class="text-white text-lg font-medium">24/7 Professional Support</p>
+                  <p class="text-white text-lg font-medium">
+                    24/7 Professional Support
+                  </p>
                 </div>
               </div>
             </div>
             <div class="p-8">
               <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                  <Icon name="fluent:person-support-16-filled" class="w-6 h-6 text-emerald-600" />
+                <div
+                  class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center"
+                >
+                  <Icon
+                    name="fluent:person-support-16-filled"
+                    class="w-6 h-6 text-emerald-600"
+                  />
                 </div>
-                <h3 class="text-2xl font-bold text-slate-900">Expert Support</h3>
+                <h3 class="text-2xl font-bold text-slate-900">
+                  Expert Support
+                </h3>
               </div>
               <p class="text-slate-600 mb-6 leading-relaxed">
-                Professional guidance and technical assistance to help you achieve your sustainability goals.
+                Professional guidance and technical assistance to help you
+                achieve your sustainability goals.
               </p>
               <ul class="space-y-3">
                 <li class="flex items-center gap-3">
-                  <Icon name="uil:check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
                   <span class="text-slate-600">24/7 technical support</span>
                 </li>
                 <li class="flex items-center gap-3">
-                  <Icon name="uil:check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
                   <span class="text-slate-600">Training programs</span>
                 </li>
                 <li class="flex items-center gap-3">
-                  <Icon name="uil:check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
                   <span class="text-slate-600">Consultation services</span>
                 </li>
               </ul>
@@ -165,41 +267,66 @@
           </div>
 
           <!-- Innovative Solutions Card -->
-          <div class="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1">
-            <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+          <div
+            class="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
+          >
+            <div
+              class="absolute top-0 left-0 w-full h-1 bg-emerald-500 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+            ></div>
             <div class="relative h-64 overflow-hidden">
-              <img 
-                src="/images/services/innovative-solutions.jpg" 
-                alt="Innovative Solutions" 
+              <img
+                src="/images/services/innovative-solutions.jpg"
+                alt="Innovative Solutions"
                 class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              >
                 <div class="absolute bottom-0 left-0 right-0 p-6">
-                  <p class="text-white text-lg font-medium">Cutting-edge Technology</p>
+                  <p class="text-white text-lg font-medium">
+                    Cutting-edge Technology
+                  </p>
                 </div>
               </div>
             </div>
             <div class="p-8">
               <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                  <Icon name="ant-design:solution-outlined" class="w-6 h-6 text-emerald-600" />
+                <div
+                  class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center"
+                >
+                  <Icon
+                    name="ant-design:solution-outlined"
+                    class="w-6 h-6 text-emerald-600"
+                  />
                 </div>
-                <h3 class="text-2xl font-bold text-slate-900">Innovative Solutions</h3>
+                <h3 class="text-2xl font-bold text-slate-900">
+                  Innovative Solutions
+                </h3>
               </div>
               <p class="text-slate-600 mb-6 leading-relaxed">
-                Cutting-edge approaches to plastic recycling and sustainability challenges.
+                Cutting-edge approaches to plastic recycling and sustainability
+                challenges.
               </p>
               <ul class="space-y-3">
                 <li class="flex items-center gap-3">
-                  <Icon name="uil:check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
                   <span class="text-slate-600">Research and development</span>
                 </li>
                 <li class="flex items-center gap-3">
-                  <Icon name="uil:check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
                   <span class="text-slate-600">Custom solutions</span>
                 </li>
                 <li class="flex items-center gap-3">
-                  <Icon name="uil:check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                  <Icon
+                    name="uil:check-circle"
+                    class="w-5 h-5 text-emerald-600 flex-shrink-0"
+                  />
                   <span class="text-slate-600">Process optimization</span>
                 </li>
               </ul>
@@ -213,56 +340,80 @@
     <section class="py-16 bg-white">
       <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12 space-y-4">
-          <span class="inline-block px-4 py-1 bg-emerald-100 text-emerald-600 rounded-full text-sm font-medium transition-all hover:bg-emerald-200">
+          <span
+            class="inline-block px-4 py-1 bg-emerald-100 text-emerald-600 rounded-full text-sm font-medium transition-all hover:bg-emerald-200"
+          >
             Why Choose Us
           </span>
           <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
             Your Trusted Partner in Plastic Recycling
           </h2>
           <p class="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            We combine expertise, innovation, and commitment to deliver exceptional plastic recycling solutions.
+            We combine expertise, innovation, and commitment to deliver
+            exceptional plastic recycling solutions.
           </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <!-- Experience Card -->
-          <div class="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all border border-slate-100">
-            <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
+          <div
+            class="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all border border-slate-100"
+          >
+            <div
+              class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-6"
+            >
               <Icon name="mdi:certificate" class="w-6 h-6 text-emerald-600" />
             </div>
-            <h3 class="text-xl font-bold text-slate-900 mb-4">25+ Years Experience</h3>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">
+              25+ Years Experience
+            </h3>
             <p class="text-slate-600 leading-relaxed">
-              Decades of expertise in plastic recycling and sustainable solutions, serving industries worldwide.
+              Decades of expertise in plastic recycling and sustainable
+              solutions, serving industries worldwide.
             </p>
           </div>
 
           <!-- Quality Card -->
-          <div class="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all border border-slate-100">
-            <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
+          <div
+            class="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all border border-slate-100"
+          >
+            <div
+              class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-6"
+            >
               <Icon name="mdi:shield-check" class="w-6 h-6 text-emerald-600" />
             </div>
-            <h3 class="text-xl font-bold text-slate-900 mb-4">Quality Assurance</h3>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">
+              Quality Assurance
+            </h3>
             <p class="text-slate-600 leading-relaxed">
-              Rigorous quality control processes ensuring the highest standards in recycling and production.
+              Rigorous quality control processes ensuring the highest standards
+              in recycling and production.
             </p>
           </div>
 
           <!-- Innovation Card -->
-          <div class="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all border border-slate-100">
-            <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
+          <div
+            class="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all border border-slate-100"
+          >
+            <div
+              class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-6"
+            >
               <Icon name="mdi:trending-up" class="w-6 h-6 text-emerald-600" />
             </div>
-            <h3 class="text-xl font-bold text-slate-900 mb-4">Innovative Approach</h3>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">
+              Innovative Approach
+            </h3>
             <p class="text-slate-600 leading-relaxed">
-              Cutting-edge technology and creative solutions for modern recycling challenges.
+              Cutting-edge technology and creative solutions for modern
+              recycling challenges.
             </p>
           </div>
         </div>
       </div>
     </section>
-    
-        <!-- Additional Sections -->
-        <WebCallToAction />
+
+    <!-- Additional Sections -->
+    <WebCallToAction />
     <WebGallery />
   </NuxtLayout>
 </template>
@@ -272,7 +423,11 @@
   position: absolute;
   width: 800px;
   height: 800px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0) 70%);
+  background: radial-gradient(
+    circle,
+    rgba(16, 185, 129, 0.1) 0%,
+    rgba(16, 185, 129, 0) 70%
+  );
   border-radius: 50%;
   top: -400px;
   left: -200px;
@@ -283,7 +438,11 @@
   position: absolute;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0) 70%);
+  background: radial-gradient(
+    circle,
+    rgba(16, 185, 129, 0.1) 0%,
+    rgba(16, 185, 129, 0) 70%
+  );
   border-radius: 50%;
   bottom: -300px;
   right: -100px;
