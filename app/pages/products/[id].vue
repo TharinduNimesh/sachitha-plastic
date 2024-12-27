@@ -1,6 +1,10 @@
 <template>
   <NuxtLayout name="web">
-    <div v-if="product" class="pt-32 pb-16">
+    <div v-if="loading" class="pt-32 pb-16 flex justify-center">
+      <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-600"></div>
+    </div>
+
+    <div v-else-if="product" class="pt-32 pb-16">
       <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Breadcrumb -->
         <nav class="mb-8">
@@ -23,31 +27,55 @@
 
         <!-- Product Details -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 my-12">
-          <!-- Product Image -->
+          <!-- Product Images -->
           <div class="my-12">
-            <!-- Image Slider for the Big Image -->
+            <!-- Image Slider -->
             <div class="relative aspect-[3/2] rounded-2xl overflow-hidden bg-slate-100">
-              <img v-if="product.image && product.image.length > 0" :src="allImages[currentImageIndex]"
-                :alt="product.name" class="w-full h-full object-cover" />
-              <button v-if="product.image && product.image.length > 0" @click="prevImage"
-                class="absolute left-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full border border-slate-200 hover:bg-blue-50 transition-colors duration-300">
-                <svg class="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button v-if="product.image && product.image.length > 0" @click="nextImage"
-                class="absolute right-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full border border-slate-200 hover:bg-blue-50 transition-colors duration-300">
-                <svg class="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+              <img 
+                v-if="allImages.length > 0" 
+                :src="getImageUrl(allImages[currentImageIndex])"
+                :alt="product.name" 
+                class="w-full h-full object-cover" 
+              />
+              <div 
+                v-else 
+                class="w-full h-full flex items-center justify-center text-slate-400"
+              >
+                <Icon name="heroicons:photo" class="w-12 h-12" />
+              </div>
+
+              <!-- Navigation Buttons -->
+              <template v-if="allImages.length > 1">
+                <button 
+                  @click="prevImage"
+                  class="absolute left-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/80 hover:bg-white transition-colors duration-300"
+                >
+                  <Icon name="heroicons:chevron-left" class="w-6 h-6 text-slate-600" />
+                </button>
+                <button 
+                  @click="nextImage"
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/80 hover:bg-white transition-colors duration-300"
+                >
+                  <Icon name="heroicons:chevron-right" class="w-6 h-6 text-slate-600" />
+                </button>
+              </template>
             </div>
 
-            <!-- Two Smaller Images -->
-            <div class="grid grid-cols-6 gap-4 mt-4">
-              <div v-for="(image, index) in allImages" :key="index" class="aspect-square rounded-2xl overflow-hidden bg-slate-100">
-                <img :src="image" :alt="product.name" class="w-full h-full object-cover" />
-              </div>
+            <!-- Thumbnail Grid -->
+            <div v-if="allImages.length > 1" class="grid grid-cols-6 gap-4 mt-4">
+              <button
+                v-for="(image, index) in allImages"
+                :key="index"
+                @click="currentImageIndex = index"
+                class="aspect-square rounded-lg overflow-hidden bg-slate-100 relative"
+                :class="currentImageIndex === index ? 'ring-2 ring-emerald-500' : ''"
+              >
+                <img 
+                  :src="getImageUrl(image)"
+                  :alt="`${product.name} - Image ${index + 1}`"
+                  class="w-full h-full object-cover" 
+                />
+              </button>
             </div>
           </div>
 
@@ -55,7 +83,7 @@
           <div class="bg-white rounded-lg space-y-6">
             <div>
               <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-600 rounded-lg text-sm font-medium mb-4">
-                {{ product.category }}
+                {{ product.category.name }}
               </span>
               <h1 class="text-4xl font-bold text-slate-900">
                 {{ product.name }}
@@ -64,26 +92,22 @@
 
             <!-- Description -->
             <div class="prose prose-slate max-w-none">
-              <p class="text-lg text-slate-600">{{ product.description }}</p>
-
-              <!-- Additional details -->
-              <div class="mt-6 space-y-4">
-                <h3 class="text-lg font-semibold text-slate-900">Key Features:</h3>
-                <ul class="list-disc pl-5 space-y-2">
-                  <li v-for="(feature, index) in product.features" :key="index">
-                    {{ feature }}
-                  </li>
-                </ul>
-              </div>
+              <div class="text-lg text-slate-600" v-html="product.description"></div>
             </div>
 
             <!-- Status and Actions -->
             <div class="pt-6 border-t border-slate-200">
               <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
-                  <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                  <span 
+                    class="w-3 h-3 rounded-full"
+                    :class="{
+                      'bg-emerald-500': product.availability === 'InStock',
+                      'bg-red-500': product.availability === 'OutOfStock'
+                    }"
+                  ></span>
                   <span class="text-sm font-medium text-slate-900">
-                    In Stock
+                    {{ product.availability === 'InStock' ? 'In Stock' : 'Out of Stock' }}
                   </span>
                 </div>
               </div>
@@ -91,19 +115,29 @@
 
             <!-- Contact Button -->
             <div class="pt-6">
-              <a href="mailto:contact@example.com"
-                class="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all duration-300 font-medium shadow-lg">
+              <a 
+                href="mailto:info@samarasinghetrade.com"
+                class="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all duration-300 font-medium shadow-lg"
+              >
                 Contact for Pricing
-                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
+                <Icon name="heroicons:arrow-right" class="w-5 h-5 ml-2" />
               </a>
             </div>
           </div>
         </div>
 
         <!-- Similar Products Section -->
-        <WebProductSimilarProduct :products="similarProducts" />
+        <div v-if="similarProducts.length > 0" class="mt-24">
+          <h2 class="text-2xl font-bold text-slate-900 mb-8">Similar Products</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+            <WebProductCard
+              v-for="similarProduct in similarProducts"
+              :key="similarProduct.id"
+              :product="similarProduct"
+              class="transition-all duration-300 hover:-translate-y-1"
+            />
+          </div>
+        </div>
       </div>
     </div>
     <div v-else class="pt-32 pb-16 text-center">
@@ -112,42 +146,137 @@
   </NuxtLayout>
 </template>
 
-<script setup>
-const props = defineProps({
-  product: {
-    type: Object,
-    required: true,
-  },
-});
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useSupabaseClient, useRuntimeConfig } from '#imports'
+import type { Database } from '~/types/database.types'
 
+type Product = Database['public']['Tables']['products']['Row'] & {
+  category: Database['public']['Tables']['categories']['Row']
+  images: Database['public']['Tables']['product_images']['Row'][]
+}
+
+// State
+const loading = ref(true)
+const product = ref<Product | null>(null)
+const similarProducts = ref<Product[]>([])
+const currentImageIndex = ref(0)
+const route = useRoute()
+const config = useRuntimeConfig()
+
+// Methods
+const getImageUrl = (path: string) => {
+  return `${config.public.supabase.url}/storage/v1/object/public/product_images/${path}`
+}
+
+// Computed
 const allImages = computed(() => {
-  console.log('Product:', product.value); // Debugging statement
-  return product.value?.image ?? []; // Fallback to an empty array if undefined
-});
-
-const currentImageIndex = ref(0);
+  if (!product.value) return []
+  
+  const images = []
+  // Add primary image first if it exists
+  if (product.value.primary_image) {
+    images.push(product.value.primary_image)
+  }
+  // Add other images
+  if (product.value.images) {
+    images.push(...product.value.images.map(img => img.path))
+  }
+  return images
+})
 
 const nextImage = () => {
-  if (allImages.value.length === 0) return;
-  currentImageIndex.value =
-    (currentImageIndex.value + 1) % allImages.value.length;
-};
+  if (currentImageIndex.value < allImages.value.length - 1) {
+    currentImageIndex.value++
+  } else {
+    currentImageIndex.value = 0
+  }
+}
 
 const prevImage = () => {
-  if (allImages.value.length === 0) return;
-  currentImageIndex.value =
-    (currentImageIndex.value - 1 + allImages.value.length) % allImages.value.length;
-};
+  if (currentImageIndex.value > 0) {
+    currentImageIndex.value--
+  } else {
+    currentImageIndex.value = allImages.value.length - 1
+  }
+}
 
-const route = useRoute();
-const { getProductByLink, getSimilarProducts } = useProducts();
+// Fetch similar products
+const fetchSimilarProducts = async (categoryId: number, currentProductId: number) => {
+  try {
+    const client = useSupabaseClient<Database>()
+    const { data, error } = await client
+      .from('products')
+      .select(`
+        *,
+        category:categories(*),
+        images:product_images(*)
+      `)
+      .eq('category_id', categoryId)
+      .eq('status', 'Active')
+      .neq('id', currentProductId)
+      .limit(10)
 
-const product = computed(() => {
-  const slug = route.params.id;
-  return getProductByLink(`/products/${slug}`);
-});
+    if (error) throw error
+    similarProducts.value = data || []
+  } catch (error) {
+    console.error('Error fetching similar products:', error)
+    similarProducts.value = []
+  }
+}
 
-const similarProducts = computed(() => {
-  return getSimilarProducts(product.value?.category, product.value?.id);
-});
+// Fetch product data
+const fetchProduct = async () => {
+  try {
+    loading.value = true
+    const client = useSupabaseClient<Database>()
+    const { data: productData, error } = await client
+      .from('products')
+      .select(`
+        *,
+        category:categories(*),
+        images:product_images(*)
+      `)
+      .eq('id', route.params.id)
+      .eq('status', 'Active')
+      .single()
+
+    if (error) throw error
+    if (!productData) throw new Error('Product not found')
+
+    product.value = productData
+
+    // Fetch similar products
+    await fetchSimilarProducts(productData.category_id, productData.id)
+
+    // Update product statistics
+    const today = new Date().toISOString().split('T')[0]
+    await client
+      .from('product_statistics')
+      .upsert({
+        product_id: productData.id,
+        date: today,
+        views: 1
+      }, {
+        onConflict: 'product_id,date'
+      })
+
+  } catch (error) {
+    console.error('Error fetching product:', error)
+    product.value = null
+  } finally {
+    loading.value = false
+  }
+}
+
+// Lifecycle
+onMounted(() => {
+  fetchProduct()
+})
 </script>
+
+<style scoped>
+.prose {
+  max-width: none;
+}
+</style>

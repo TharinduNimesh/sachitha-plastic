@@ -497,7 +497,7 @@ const handleSubmit = async () => {
         availability: product.availability,
         status: product.status,
         primary_image: primaryImagePath,
-        updated_at: new Date().toString(),
+        updated_at: new Date().toISOString(),
       })
       .eq('id', product.id);
 

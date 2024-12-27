@@ -118,7 +118,7 @@
                     >
                       <option value="">All Status</option>
                       <option value="Active">Active</option>
-                      <option value="Hidden">Archived</option>
+                      <option value="Archived">Archived</option>
                     </select>
                   </div>
                 </div>
@@ -199,33 +199,201 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { onClickOutside } from '@vueuse/core'
 import type { Database } from '~/types/database.types'
+import { onClickOutside } from '@vueuse/core'
 
 type Product = Database['public']['Tables']['products']['Row'] & {
   category: Database['public']['Tables']['categories']['Row']
 }
 
-// Replace dummy products with real data
-const { fetchProducts, updateProduct, loading, error } = useProducts()
-const products = ref<Product[]>([])
-
-// Fetch products on mount
-onMounted(async () => {
-  products.value = await fetchProducts()
-})
-
-// Refs for click outside detection
-const filterMenuRef = ref<HTMLElement | null>(null)
-const sortMenuRef = ref<HTMLElement | null>(null)
-
 // State
+const loading = ref(true)
+const error = ref<string | null>(null)
+const products = ref<Product[]>([])
 const searchQuery = ref('')
 const selectedCategory = ref('')
 const selectedStatus = ref('')
 const sortBy = ref('newest')
 const isFilterMenuOpen = ref(false)
 const isSortMenuOpen = ref(false)
+const showConfirmModal = ref(false)
+const productToArchive = ref<Product | null>(null)
+
+// Refs for click outside handling
+const filterMenuRef = ref<HTMLElement | null>(null)
+const sortMenuRef = ref<HTMLElement | null>(null)
+
+// Toast composable
+const { success, error: toastError } = useToast()
+
+// Computed
+const hasActiveFilters = computed(() => {
+  return selectedCategory.value || selectedStatus.value || searchQuery.value
+})
+
+const confirmMessage = computed(() => {
+  return `Are you sure you want to archive ${productToArchive.value?.name}? This will hide the product from the website.`
+})
+
+const filteredProducts = computed(() => {
+  let result = [...products.value]
+
+  // Search filter
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    result = result.filter(product => 
+      product.name.toLowerCase().includes(query) ||
+      product.category.name.toLowerCase().includes(query) ||
+      product.status.toLowerCase().includes(query)
+    )
+  }
+
+  // Category filter
+  if (selectedCategory.value) {
+    result = result.filter(product => product.category.name === selectedCategory.value)
+  }
+
+  // Status filter
+  if (selectedStatus.value) {
+    const status = selectedStatus.value === 'Archived' ? 'Hidden' : selectedStatus.value
+    result = result.filter(product => product.status === status)
+  }
+
+  // Sort
+  switch (sortBy.value) {
+    case 'newest':
+      result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      break
+    case 'oldest':
+      result.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      break
+    case 'name_asc':
+      result.sort((a, b) => a.name.localeCompare(b.name))
+      break
+    case 'name_desc':
+      result.sort((a, b) => b.name.localeCompare(a.name))
+      break
+  }
+
+  return result
+})
+
+// Methods
+const fetchProducts = async () => {
+  try {
+    loading.value = true
+    error.value = null
+    const client = useSupabaseClient<Database>()
+    
+    const { data, error: supabaseError } = await client
+      .from('products')
+      .select(`
+        *,
+        category:categories(*)
+      `)
+      .order('created_at', { ascending: false })
+
+    if (supabaseError) throw supabaseError
+
+    products.value = data || []
+  } catch (e) {
+    console.error('Error fetching products:', e)
+    error.value = 'Failed to load products. Please try again.'
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleEdit = (product: Product) => {
+  navigateTo(`/console/products/${product.id}`)
+}
+
+const handlePreview = (product: Product) => {
+  navigateTo(`/products/${product.id}`)
+}
+
+const handleDelete = (product: Product) => {
+  productToArchive.value = product
+  showConfirmModal.value = true
+}
+
+const confirmArchive = async () => {
+  if (!productToArchive.value) return
+
+  try {
+    loading.value = true
+    const client = useSupabaseClient<Database>()
+    
+    const { error: updateError } = await client
+      .from('products')
+      .update({ status: 'Hidden' })
+      .eq('id', productToArchive.value.id)
+
+    if (updateError) throw updateError
+
+    // Update local state
+    const index = products.value.findIndex(p => p.id === productToArchive.value?.id)
+    if (index !== -1) {
+      products.value[index].status = 'Hidden'
+    }
+
+    success('Product archived successfully')
+  } catch (e) {
+    console.error('Error archiving product:', e)
+    toastError('Failed to archive product. Please try again.')
+  } finally {
+    loading.value = false
+    showConfirmModal.value = false
+    productToArchive.value = null
+  }
+}
+
+const toggleStatus = async (product: Product) => {
+  try {
+    loading.value = true
+    const newStatus = product.status === 'Active' ? 'Hidden' : 'Active'
+    const client = useSupabaseClient<Database>()
+    
+    const { error: updateError } = await client
+      .from('products')
+      .update({ status: newStatus })
+      .eq('id', product.id)
+
+    if (updateError) throw updateError
+
+    // Update local state
+    const index = products.value.findIndex(p => p.id === product.id)
+    if (index !== -1) {
+      products.value[index].status = newStatus
+    }
+
+    success(`Product ${newStatus === 'Active' ? 'activated' : 'archived'} successfully`)
+  } catch (e) {
+    console.error('Error toggling product status:', e)
+    toastError('Failed to update product status. Please try again.')
+  } finally {
+    loading.value = false
+  }
+}
+
+const clearFilters = () => {
+  searchQuery.value = ''
+  selectedCategory.value = ''
+  selectedStatus.value = ''
+}
+
+const selectSortOption = (value: string) => {
+  sortBy.value = value
+  isSortMenuOpen.value = false
+}
+
+// Sort options
+const sortOptions = [
+  { value: 'newest', label: 'Newest First', icon: 'i-uil-clock' },
+  { value: 'oldest', label: 'Oldest First', icon: 'i-uil-clock' },
+  { value: 'name_asc', label: 'Name (A-Z)', icon: 'i-uil-sort-amount-down' },
+  { value: 'name_desc', label: 'Name (Z-A)', icon: 'i-uil-sort-amount-up' }
+]
 
 // Click outside handlers
 onClickOutside(filterMenuRef, () => {
@@ -236,124 +404,8 @@ onClickOutside(sortMenuRef, () => {
   isSortMenuOpen.value = false
 })
 
-// Computed properties
-const hasActiveFilters = computed(() => selectedCategory.value || selectedStatus.value)
-
-// Modified computed property to work with real data
-const filteredProducts = computed(() => {
-  let filtered = [...products.value]
-  
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(product => 
-      product.name.toLowerCase().includes(query) ||
-      product.category.name.toLowerCase().includes(query) ||
-      product.status.toLowerCase().includes(query)
-    )
-  }
-
-  if (selectedCategory.value) {
-    filtered = filtered.filter(product => 
-      product.category.name === selectedCategory.value
-    )
-  }
-
-  if (selectedStatus.value) {
-    filtered = filtered.filter(product => 
-      product.status === selectedStatus.value
-    )
-  }
-
-  // Sort products
-  switch (sortBy.value) {
-    case 'newest':
-      filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      break
-    case 'oldest':
-      filtered.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-      break
-    case 'name':
-      filtered.sort((a, b) => a.name.localeCompare(b.name))
-      break
-    case 'name-desc':
-      filtered.sort((a, b) => b.name.localeCompare(a.name))
-      break
-  }
-
-  return filtered
+// Lifecycle
+onMounted(() => {
+  fetchProducts()
 })
-
-const handlePreview = (product: Product) => {
-  console.log('Preview product:', product)
-}
-
-const { success, error: toastError } = useToast()
-
-// Add state for confirmation modal
-const showConfirmModal = ref(false)
-const productToArchive = ref<Product | null>(null)
-const confirmMessage = computed(() => 
-  productToArchive.value 
-    ? `Are you sure you want to archive "${productToArchive.value.name}"? This will hide the product from the website.`
-    : ''
-)
-
-const handleDelete = (product: Product) => {
-  productToArchive.value = product
-  showConfirmModal.value = true
-}
-
-const confirmArchive = async () => {
-  if (!productToArchive.value) return
-
-  const { success: isSuccess } = await updateProduct(productToArchive.value.id, {
-    status: 'Hidden'
-  })
-
-  if (isSuccess) {
-    success(`${productToArchive.value.name} has been archived successfully.`)
-  } else {
-    toastError('Failed to archive product. Please try again.')
-  }
-
-  productToArchive.value = null
-}
-
-// Sort options
-const sortOptions = ref([
-  { value: 'newest', label: 'Newest First', icon: 'i-uil-clock' },
-  { value: 'oldest', label: 'Oldest First', icon: 'i-uil-clock' },
-  { value: 'name', label: 'Name A-Z', icon: 'i-uil-sort-alpha-down' },
-  { value: 'name-desc', label: 'Name Z-A', icon: 'i-uil-sort-alpha-up-alt' },
-])
-
-// Clear filters
-const clearFilters = () => {
-  selectedCategory.value = ''
-  selectedStatus.value = ''
-}
-
-// Select sort option
-const selectSortOption = (value: string) => {
-  sortBy.value = value
-  isSortMenuOpen.value = false
-}
-
-// Add status toggle function
-const toggleStatus = async (product: Product) => {
-  const newStatus = product.status === 'Active' ? 'Hidden' : 'Active'
-  const { success: isSuccess } = await updateProduct(product.id, {
-    status: newStatus
-  })
-
-  if (isSuccess) {
-    // Update the product in the local state
-    products.value = products.value.map(p => 
-      p.id === product.id ? { ...p, status: newStatus } : p
-    )
-    success(`Product ${newStatus === 'Active' ? 'activated' : 'archived'} successfully.`)
-  } else {
-    toastError('Failed to update product status. Please try again.')
-  }
-}
 </script>
