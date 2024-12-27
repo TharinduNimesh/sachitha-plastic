@@ -26,7 +26,7 @@
           style="scroll-behavior: smooth;">
           <!-- Category Cards -->
           <div v-for="category in categories" :key="category.id" class="flex-none w-72">
-            <NuxtLink :to="category.link" class="group block relative">
+            <NuxtLink :to="`/category/${category.id}`" class="group block relative">
               <div class="relative aspect-[4/5] overflow-hidden rounded-2xl bg-slate-100">
                 <img :src="category.image" :alt="category.name"
                   class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110" />
@@ -48,63 +48,20 @@ import { ref } from 'vue'
 
 const scrollContainer = ref(null)
 
-const categories = [
-  {
-    id: 1,
-    name: 'Household Products',
-    image: '/images/categories/household.jpg',
-    link: '/products/category/household'
-  },
-  {
-    id: 2,
-    name: 'Garden Products',
-    image: '/images/categories/garden.jpg',
-    link: '/products/category/garden'
-  },
-  {
-    id: 3,
-    name: 'Toys',
-    image: '/images/categories/toys.jpg',
-    link: '/products/category/toys'
-  },
-  {
-    id: 4,
-    name: 'Recycling Machines',
-    image: '/images/categories/recycling-machines.jpg',
-    link: '/products/category/recycling-machines'
-  },
-  {
-    id: 5,
-    name: 'Mould Accessories',
-    image: '/images/categories/mould-accessories.jpg',
-    link: '/products/category/mould-accessories'
-  },
-  {
-    id: 6,
-    name: 'Mould Polishing Tools',
-    image: '/images/categories/mould-polishing-tools.jpg',
-    link: '/products/category/mould-polishing-tools'
-  },
-  {
-    id: 7,
-    name: 'Injection Mold Machine Spare Parts',
-    image: '/images/categories/injection-mold-parts.jpg',
-    link: '/products/category/injection-mold-parts'
-  },
-  {
-    id: 8,
-    name: 'Plastic Industry Chemicals',
-    image: '/images/categories/plastic-chemicals.jpg',
-    link: '/products/category/plastic-chemicals'
-  },
-  {
-    id: 9,
-    name: 'Raw Materials',
-    image: '/images/categories/raw-materials.jpg',
-    link: '/products/category/raw-materials'
-  }
-];
+const supabase = useSupabaseClient();
+const categories = ref([]);
 
+async function loadCategories() {
+  // load categories from the supabase and asign them into categories ref
+  const { data, error } = await supabase.from('categories').select('*')
+  if (error) {
+    console.error(error)
+  } else {
+    categories.value = data
+  } 
+}
+
+await loadCategories()
 
 const scrollLeft = () => {
   if (scrollContainer.value) {
