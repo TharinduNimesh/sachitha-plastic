@@ -33,7 +33,7 @@
             <div class="relative aspect-[3/2] rounded-2xl overflow-hidden bg-slate-100">
               <img 
                 v-if="allImages.length > 0" 
-                :src="getImageUrl(allImages[currentImageIndex])"
+                :src="getImageUrl(allImages[currentImageIndex] ?? '')"
                 :alt="product.name" 
                 class="w-full h-full object-cover" 
               />
@@ -170,20 +170,22 @@ const getImageUrl = (path: string) => {
 }
 
 // Computed
-const allImages = computed(() => {
-  if (!product.value) return []
+// const allImages = computed(() => {
+//   if (!product.value) return []
   
-  const images = []
-  // Add primary image first if it exists
-  if (product.value.primary_image) {
-    images.push(product.value.primary_image)
-  }
-  // Add other images
-  if (product.value.images) {
-    images.push(...product.value.images.map(img => img.path))
-  }
-  return images
-})
+//   const images = []
+//   // Add primary image first if it exists
+//   if (product.value.primary_image) {
+//     images.push(product.value.primary_image)
+//   }
+//   // Add other images
+//   if (product.value.images) {
+//     images.push(...product.value.images.map(img => img.path))
+//   }
+//   console.log("images", images)
+//   return images
+// })
+const allImages = ref<string[]>([])
 
 const nextImage = () => {
   if (currentImageIndex.value < allImages.value.length - 1) {
@@ -209,8 +211,8 @@ const fetchSimilarProducts = async (categoryId: number, currentProductId: number
       .from('products')
       .select(`
         *,
-        category:categories(*),
-        images:product_images(*)
+        category:categories(name),
+        images:product_images()
       `)
       .eq('category_id', categoryId)
       .eq('status', 'Active')
@@ -218,7 +220,11 @@ const fetchSimilarProducts = async (categoryId: number, currentProductId: number
       .limit(10)
 
     if (error) throw error
-    similarProducts.value = data || []
+
+    similarProducts.value = data.map((product: any) => ({
+      ...product,
+      category: product.category.name,
+    }));
   } catch (error) {
     console.error('Error fetching similar products:', error)
     similarProducts.value = []
@@ -228,39 +234,39 @@ const fetchSimilarProducts = async (categoryId: number, currentProductId: number
 // Fetch product data
 const fetchProduct = async () => {
   try {
-    loading.value = true
     const client = useSupabaseClient<Database>()
     const { data: productData, error } = await client
-      .from('products')
+    .from('products')
       .select(`
         *,
-        category:categories(*),
-        images:product_images(*)
+        category:categories(name),
+        images:product_images(path)
       `)
-      .eq('id', route.params.id)
       .eq('status', 'Active')
+      .eq('id', Number(route.params.id))
       .single()
 
     if (error) throw error
-    if (!productData) throw new Error('Product not found')
 
-    product.value = productData
+    product.value = productData as Product
+    allImages.value = [productData.primary_image, ...productData.images.map((img: any) => img.path)]  
 
     // Fetch similar products
-    await fetchSimilarProducts(productData.category_id, productData.id)
+    if (productData) {
+      await fetchSimilarProducts(productData.category_id, productData.id)
 
-    // Update product statistics
-    const today = new Date().toISOString().split('T')[0]
-    await client
-      .from('product_statistics')
-      .upsert({
-        product_id: productData.id,
-        date: today,
-        views: 1
-      }, {
-        onConflict: 'product_id,date'
-      })
-
+      // Update product statistics
+      const today = new Date().toISOString().split('T')[0] as string
+      await client
+        .from('product_statistics')
+        .upsert({
+          product_id: productData.id,
+          date: today,
+          views: 1
+        }, {
+          onConflict: 'product_id,date'
+        })
+    }
   } catch (error) {
     console.error('Error fetching product:', error)
     product.value = null

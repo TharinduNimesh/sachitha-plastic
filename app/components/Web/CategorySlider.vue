@@ -26,7 +26,7 @@
           style="scroll-behavior: smooth;">
           <!-- Category Cards -->
           <div v-for="category in categories" :key="category.id" class="flex-none w-72">
-            <NuxtLink :to="`/category/${category.id}`" class="group block relative">
+            <NuxtLink :to="`/products/category/${category.id}`" class="group block relative">
               <div class="relative aspect-[4/5] overflow-hidden rounded-2xl bg-slate-100">
                 <img :src="category.image" :alt="category.name"
                   class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110" />
