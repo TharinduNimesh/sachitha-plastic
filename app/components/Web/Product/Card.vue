@@ -14,10 +14,10 @@
       <!-- Category Badge -->
       <div class="absolute top-4 left-4" @click.stop>
         <NuxtLink
-          :to="`/products/category/${(product.category || '').toLowerCase()}`"
+          :to="`/products/category/${product.category_id}`"
           class="px-3 py-1.5 bg-white/95 backdrop-blur-sm text-emerald-600 rounded-lg text-sm font-medium hover:bg-white hover:text-emerald-700 transition-colors duration-300"
         >
-          {{ product.category || "Uncategorized" }}
+          {{ product.category }}
         </NuxtLink>
       </div>
     </div>
@@ -50,7 +50,7 @@
         <!-- Learn More Link -->
         <div @click.stop>
           <NuxtLink
-            :to="`/products/category/${product.category.toLowerCase()}`"
+            :to="`/products/${product.id}`"
             class="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors duration-300"
           >
             Learn More
@@ -61,24 +61,23 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const router = useRouter();
-const props = defineProps({
-  product: {
-    type: Object,
-    required: true,
-    default: () => ({
-      primary_image: "",
-      name: "",
-      category: "",
-      description: "",
-      link: "",
-    }),
-  },
-});
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  primary_image: string;
+  category_id: number;
+  category: string;
+}
+
+const props = defineProps<{
+  product: Product
+}>();
 
 const navigateToProduct = () => {
-  router.push(props.product.link);
+  router.push(`/products/${props.product.id}`);
 };
 
 const cleanDescription = computed(() => {

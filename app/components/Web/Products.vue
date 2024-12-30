@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto space-y-8">
+  <div class="container mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
     <!-- Search and Filters -->
     <div class="bg-white rounded-xl shadow-sm  py-6">
       <div class="flex flex-col gap-6">

@@ -3,12 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "supabase:generate": "npx supabase gen types typescript --project-id dtgvsrafxdeatrlucoiq --schema public > ./app/types/database.types.ts"
+    "build": "bun run nuxt build",
+    "dev": "bun run nuxt dev",
+    "generate": "bun run nuxt generate",
+    "preview": "bun run nuxt preview",
+    "postinstall": "bun run nuxt prepare",
+    "supabase:generate": "bun run npx supabase gen types typescript --project-id dtgvsrafxdeatrlucoiq --schema public > ./app/types/database.types.ts"
   },
   "dependencies": {
     "@iconify-json/uil": "^1.2.1",
