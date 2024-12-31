@@ -35,6 +35,6 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    "/console/**": { ssr: false, appMiddleware: ["auth"] },
+    "/console/**": { ssr: false, appMiddleware: ["auth", "role"] },
   },
 });

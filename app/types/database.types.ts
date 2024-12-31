@@ -273,6 +273,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      increment_product_views: {
+        Args: {
+          product_id_input: number
+        }
+        Returns: undefined
+      }
       is_admin_user: {
         Args: {
           user_id_input: string

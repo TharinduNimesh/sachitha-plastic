@@ -103,9 +103,9 @@
                       class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                     >
                       <option value="">All Categories</option>
-                      <option>Machinery</option>
-                      <option>Household</option>
-                      <option>Industrial</option>
+                      <option v-for="category in categories" :key="category.id" :value="category.name">
+                        {{ category.name }}
+                      </option>
                     </select>
                   </div>
 
@@ -169,20 +169,56 @@
         {{ error }}
       </div>
 
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <ConsoleProductsCard
-          v-for="product in filteredProducts"
-          :key="product.id"
-          :id="product.id"
-          :title="product.name"
-          :category="product.category.name"
-          :status="product.status === 'Hidden' ? 'Archived' : product.status"
-          :image="product.primary_image || ''"
-          @edit="handleEdit(product)"
-          @preview="handlePreview(product)"
-          @archive="handleDelete(product)"
-          @toggle-status="toggleStatus(product)"
-        />
+      <div v-else>
+        <!-- Products Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <ConsoleProductsCard
+            v-for="product in paginatedProducts"
+            :key="product.id"
+            :id="product.id"
+            :title="product.name"
+            :category="product.category.name"
+            :status="product.status === 'Hidden' ? 'Archived' : product.status"
+            :image="product.primary_image || ''"
+            @edit="handleEdit(product)"
+            @preview="handlePreview(product)"
+            @archive="handleDelete(product)"
+            @toggle-status="toggleStatus(product)"
+          />
+        </div>
+
+        <!-- Pagination Controls -->
+        <div v-if="totalPages > 1" class="mt-8 flex items-center justify-center gap-2">
+          <button
+            @click="prevPage"
+            :disabled="currentPage === 1"
+            class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Icon name="i-uil-angle-left" class="w-5 h-5" />
+          </button>
+
+          <button
+            v-for="page in totalPages"
+            :key="page"
+            @click="handlePageChange(page)"
+            :class="[
+              'inline-flex items-center justify-center w-10 h-10 rounded-lg border text-sm font-medium',
+              currentPage === page
+                ? 'border-emerald-500 bg-emerald-50 text-emerald-600'
+                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+            ]"
+          >
+            {{ page }}
+          </button>
+
+          <button
+            @click="nextPage"
+            :disabled="currentPage === totalPages"
+            class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Icon name="i-uil-angle-right" class="w-5 h-5" />
+          </button>
+        </div>
       </div>
     </div>
     
@@ -218,6 +254,7 @@ const isFilterMenuOpen = ref(false)
 const isSortMenuOpen = ref(false)
 const showConfirmModal = ref(false)
 const productToArchive = ref<Product | null>(null)
+const categories = ref<Database['public']['Tables']['categories']['Row'][]>([])
 
 // Refs for click outside handling
 const filterMenuRef = ref<HTMLElement | null>(null)
@@ -278,6 +315,15 @@ const filteredProducts = computed(() => {
   return result
 })
 
+const currentPage = ref(1)
+const itemsPerPage = 6
+const totalPages = computed(() => Math.ceil(filteredProducts.value.length / itemsPerPage))
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return filteredProducts.value.slice(start, end)
+})
+
 // Methods
 const fetchProducts = async () => {
   try {
@@ -301,6 +347,22 @@ const fetchProducts = async () => {
     error.value = 'Failed to load products. Please try again.'
   } finally {
     loading.value = false
+  }
+}
+
+const fetchCategories = async () => {
+  try {
+    const client = useSupabaseClient<Database>()
+    const { data, error: supabaseError } = await client
+      .from('categories')
+      .select('*')
+      .order('name')
+    
+    if (supabaseError) throw supabaseError
+    categories.value = data || []
+  } catch (e) {
+    console.error('Error fetching categories:', e)
+    error.value = 'Failed to load categories'
   }
 }
 
@@ -404,8 +466,27 @@ onClickOutside(sortMenuRef, () => {
   isSortMenuOpen.value = false
 })
 
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+}
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+  }
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
+
 // Lifecycle
-onMounted(() => {
-  fetchProducts()
+onMounted(async () => {
+  await Promise.all([
+    fetchProducts(),
+    fetchCategories()
+  ])
 })
 </script>

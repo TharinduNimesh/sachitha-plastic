@@ -105,14 +105,9 @@
       </div>
 
       <!-- Loading State -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div v-for="n in 6" :key="n" class="animate-pulse">
-          <div class="bg-slate-200 rounded-xl aspect-[4/3]"></div>
-          <div class="mt-4 space-y-3">
-            <div class="h-5 bg-slate-200 rounded w-2/3"></div>
-            <div class="h-4 bg-slate-200 rounded w-1/3"></div>
-          </div>
-        </div>
+      <div v-if="loading" class="text-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto"></div>
+        <p class="mt-4 text-sm text-slate-600">Loading categories...</p>
       </div>
 
       <!-- Empty State -->
@@ -124,11 +119,17 @@
         </p>
       </div>
 
+      <!-- Modals -->
       <CommonModalNewCategoryModal
         v-model="showNewCategoryModal"
-        @created="handleCategoryCreated"
+        @category-created="handleCategoryCreated"
       />
-
+      <CommonModalEditCategoryModal
+        v-if="showEditCategoryModal && selectedCategory"
+        v-model="showEditCategoryModal"
+        :category="selectedCategory"
+        @category-updated="handleCategoryUpdated"
+      />
       <CommonModalDeleteCategoryModal
         v-model="showDeleteModal"
         :category="categoryToDelete"
@@ -145,12 +146,14 @@ import { onClickOutside } from '@vueuse/core'
 type Category = Database['public']['Tables']['categories']['Row']
 
 const client = useSupabaseClient<Database>()
-const { toast } = useToast()
+const toast = useToast()
 
 const loading = ref(true)
 const categories = ref<Category[]>([])
 const showNewCategoryModal = ref(false)
+const showEditCategoryModal = ref(false)
 const showDeleteModal = ref(false)
+const selectedCategory = ref<Category | null>(null)
 const categoryToDelete = ref<Category | null>(null)
 
 // Search and Filter
@@ -230,8 +233,14 @@ const handleCategoryCreated = () => {
 
 // Handle edit category
 const handleEdit = (category: Category) => {
-  // TODO: Implement edit functionality
-  console.log('Edit category:', category)
+  selectedCategory.value = category
+  showEditCategoryModal.value = true
+}
+
+// Handle category updated
+const handleCategoryUpdated = () => {
+  selectedCategory.value = null
+  fetchCategories()
 }
 
 // Handle delete category
@@ -257,7 +266,6 @@ const selectSortOption = (value: string) => {
   sortBy.value = value
   isSortMenuOpen.value = false
 }
-
 
 watch(showNewCategoryModal, () => {
   if (!showNewCategoryModal.value) {

@@ -19,6 +19,10 @@
                 <NuxtLink to="/products" class="text-slate-600 hover:text-emerald-600">Products</NuxtLink>
               </li>
               <li><span class="text-slate-400">/</span></li>
+              <li>
+                <NuxtLink to="/products/category" class="text-slate-600 hover:text-emerald-600">Category</NuxtLink>
+              </li>
+              <li><span class="text-slate-400">/</span></li>
               <li class="text-emerald-600 font-medium">{{ category.name }}</li>
             </ol>
           </nav>

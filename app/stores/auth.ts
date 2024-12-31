@@ -20,38 +20,35 @@ export const useAuthStore = defineStore("auth", {
 
   actions: {
     async fetchUser() {
-      if (this.loading) return null;
+      if (this.loading || this.isAuthenticated) return this.$state;
 
       try {
         this.loading = true;
         this.error = null;
 
-        const {
-          data: { user },
-        } = await useSupabaseClient().auth.getUser();
+        const { data: { user } } = await useSupabaseClient().auth.getUser();
         if (!user) {
           this.clearUser();
           return null;
         }
 
-        const [profileData, statusData] = await this.fetchData(user.id);
+        const cachedData = await useAsyncData(`user-${user.id}`, async () => {
+          const [profileData, statusData] = await this.fetchData(user.id);
+          if (!statusData.data) {
+            await this.setupUser(user.email!);
+            return await this.fetchData(user.id);
+          }
+          return [profileData, statusData];
+        }, { server: false, lazy: true });
 
-        if (!statusData.data) {
-          await this.setupUser(user.email!);
-          const [newProfileData, newStatusData] = await this.fetchData(user.id);
-          return this.updateUserState(
-            newProfileData.data as Profile,
-            newStatusData.data as UserStatus
-          );
-        }
+        const [profileData, statusData] = cachedData.data.value;
 
         return this.updateUserState(
           profileData.data as Profile,
           statusData.data as UserStatus
         );
       } catch (error) {
-        this.error =
-          error instanceof Error ? error.message : "An unknown error occurred";
+        this.error = error instanceof Error ? error.message : "An unknown error occurred";
         return null;
       } finally {
         this.loading = false;

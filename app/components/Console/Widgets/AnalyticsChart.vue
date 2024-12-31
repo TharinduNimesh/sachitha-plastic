@@ -13,21 +13,21 @@ import {
   LinearScale,
   PointElement,
   LineElement,
-  Filler,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 } from 'chart.js'
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
-  Filler,
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 )
 
 const props = defineProps<{
@@ -42,10 +42,15 @@ const chartData = computed(() => ({
       label: 'Page Views',
       data: props.data,
       borderColor: '#059669',
-      backgroundColor: 'rgba(6, 182, 112, 0.2)',
+      backgroundColor: 'rgba(5, 150, 105, 0.1)',
       fill: true,
       tension: 0.4,
-      pointRadius: 2
+      borderWidth: 2,
+      pointBackgroundColor: '#059669',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+      pointRadius: 4,
+      pointHoverRadius: 6
     }
   ]
 }))
@@ -53,23 +58,43 @@ const chartData = computed(() => ({
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
+  interaction: {
+    intersect: false,
+    mode: 'index'
+  },
   plugins: {
     legend: {
       display: false
+    },
+    tooltip: {
+      enabled: true,
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      titleColor: '#fff',
+      bodyColor: '#fff',
+      padding: 12,
+      displayColors: false
     }
   },
   scales: {
     y: {
       beginAtZero: true,
       grid: {
-        color: '#f1f5f9'
+        color: '#f1f5f9',
+        drawBorder: false
+      },
+      ticks: {
+        precision: 0,
+        color: '#64748b'
       }
     },
     x: {
       grid: {
         display: false
+      },
+      ticks: {
+        color: '#64748b'
       }
     }
-  },
+  }
 }
 </script>
