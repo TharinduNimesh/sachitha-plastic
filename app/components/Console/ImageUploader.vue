@@ -35,7 +35,7 @@
       <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
         <div
           v-for="(image, index) in images"
-          :key="index"
+          :key="image.id"
           class="relative group aspect-square"
         >
           <img
@@ -74,6 +74,7 @@
 
         <!-- Upload More Button -->
         <button
+          v-if="canAddMoreImages"
           type="button"
           @click="$refs.fileInput.click()"
           class="border-2 border-dashed border-slate-300 rounded-lg p-4 hover:border-slate-400 flex flex-col items-center justify-center aspect-square"
@@ -81,6 +82,9 @@
           <Icon name="i-uil-plus" class="w-6 h-6 text-slate-400" />
           <span class="mt-2 text-xs text-slate-600">Add More</span>
         </button>
+        <div v-else class="text-center p-4">
+          <span class="text-xs text-slate-600">Maximum {{ props.maxImages }} images reached.</span>
+        </div>
       </div>
     </div>
 
@@ -101,88 +105,120 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 interface Image {
   url: string;
-  file: File;
-  isPrimary: boolean;
+  id: string;
+  isPrimary?: boolean;
 }
 
 const props = defineProps<{
   modelValue: Image[];
+  maxImages?: number;
 }>();
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: Image[]): void;
-}>();
-
+const emit = defineEmits(['update:modelValue']);
 const isDragging = ref(false);
+const fileInput = ref<HTMLInputElement>();
 const uploadProgress = ref(0);
-const fileInput = ref<HTMLInputElement | null>(null);
 
-const images = ref<Image[]>(props.modelValue || []);
+const images = computed({
+  get: () => props.modelValue || [],
+  set: (value) => emit('update:modelValue', value)
+});
 
-// Watch for changes in images array and emit updates
-watch(images, (newImages) => {
-  emit('update:modelValue', newImages.value);
-}, { deep: true });
+// Check if we can add more images
+const canAddMoreImages = computed(() => {
+  return !props.maxImages || images.value.length < props.maxImages;
+});
 
-const handleFileSelect = async (event: Event) => {
-  const files = (event.target as HTMLInputElement).files;
-  if (files) {
-    await processFiles(Array.from(files));
-  }
+// Get remaining slots
+const remainingSlots = computed(() => {
+  if (!props.maxImages) return undefined;
+  return Math.max(0, props.maxImages - images.value.length);
+});
+
+const handleFileSelect = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (!input.files?.length) return;
+
+  const remainingCount = props.maxImages ? props.maxImages - images.value.length : input.files.length;
+  const filesToProcess = Array.from(input.files).slice(0, remainingCount);
+  
+  processFiles(filesToProcess);
+  input.value = ''; // Reset input
 };
 
-const handleDrop = async (event: DragEvent) => {
+const handleDrop = (event: DragEvent) => {
   isDragging.value = false;
-  const files = event.dataTransfer?.files;
-  if (files) {
-    await processFiles(Array.from(files));
-  }
+  const droppedFiles = Array.from(event.dataTransfer?.files || []);
+  if (!droppedFiles.length) return;
+
+  const remainingCount = props.maxImages ? props.maxImages - images.value.length : droppedFiles.length;
+  const filesToProcess = droppedFiles.slice(0, remainingCount);
+  
+  processFiles(filesToProcess);
 };
 
 const processFiles = async (files: File[]) => {
   const imageFiles = files.filter(file => file.type.startsWith('image/'));
-  
-  for (const file of imageFiles) {
-    const url = URL.createObjectURL(file);
-    images.value.push({
-      url,
-      file,
-      isPrimary: images.value.length === 0 // First image is primary by default
-    });
+  if (!imageFiles.length) return;
 
-    // Simulate upload progress
-    uploadProgress.value = 0;
-    const interval = setInterval(() => {
-      uploadProgress.value += 10;
-      if (uploadProgress.value >= 100) {
-        clearInterval(interval);
-        setTimeout(() => {
-          uploadProgress.value = 0;
-        }, 500);
-      }
-    }, 200);
+  const newImages = [...images.value];
+
+  for (const file of imageFiles) {
+    try {
+      uploadProgress.value = 0;
+      const reader = new FileReader();
+      
+      reader.onprogress = (event) => {
+        if (event.lengthComputable) {
+          uploadProgress.value = Math.round((event.loaded / event.total) * 100);
+        }
+      };
+
+      const imageUrl = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      newImages.push({
+        url: imageUrl,
+        id: crypto.randomUUID(),
+        isPrimary: newImages.length === 0
+      });
+
+      uploadProgress.value = 100;
+      setTimeout(() => {
+        uploadProgress.value = 0;
+      }, 1000);
+    } catch (error) {
+      console.error('Error processing image:', error);
+    }
   }
+
+  emit('update:modelValue', newImages);
 };
 
 const setPrimaryImage = (index: number) => {
-  images.value = images.value.map((image, i) => ({
-    ...image,
+  const newImages = images.value.map((img, i) => ({
+    ...img,
     isPrimary: i === index
   }));
+  emit('update:modelValue', newImages);
 };
 
 const removeImage = (index: number) => {
-  const image = images.value[index];
-  URL.revokeObjectURL(image.url);
-  images.value.splice(index, 1);
+  const newImages = [...images.value];
+  newImages.splice(index, 1);
 
-  // If we removed the primary image, set the first remaining image as primary
-  if (image.isPrimary && images.value.length > 0) {
-    images.value[0].isPrimary = true;
+  // If we removed the primary image and there are other images, set the first one as primary
+  if (newImages.length > 0 && !newImages.some(img => img.isPrimary)) {
+    newImages[0].isPrimary = true;
   }
+
+  emit('update:modelValue', newImages);
 };
 </script>

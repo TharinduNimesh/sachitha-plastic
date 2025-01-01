@@ -7,7 +7,13 @@ export default defineNuxtConfig({
   },
 
   devtools: { enabled: true },
-  modules: ["@nuxtjs/tailwindcss", "@nuxt/icon", "@pinia/nuxt"],
+  modules: [
+    "@nuxtjs/tailwindcss",
+    "@nuxt/icon",
+    "@pinia/nuxt",
+    "@pinia-plugin-persistedstate/nuxt",
+    "@nuxtjs/supabase",
+  ],
   icon: {
     serverBundle: {
       collections: ["uil"],
@@ -17,5 +23,18 @@ export default defineNuxtConfig({
   tailwindcss: {
     cssPath: "~/assets/css/tailwind.css",
     configPath: "~/tailwind.config.ts",
+  },
+
+  supabase: {
+    redirect: false,
+    cookieOptions: {
+      maxAge: 60 * 60 * 8, // 8 hours
+      secure: true,
+      sameSite: 'lax'
+    }
+  },
+
+  routeRules: {
+    "/console/**": { ssr: false, appMiddleware: ["auth", "role"] },
   },
 });

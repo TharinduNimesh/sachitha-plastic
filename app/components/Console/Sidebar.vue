@@ -17,7 +17,7 @@
           class="flex items-center"
           :class="{ 'justify-center': sidebarStore.isCollapsed }"
         >
-          <img src="/images/logo.webp" alt="Logo" class="h-8 w-auto" />
+          <img src="/images/logo.png" alt="Logo" class="h-8 w-auto" />
           <div v-if="!sidebarStore.isCollapsed" class="flex flex-col ml-3">
             <span class="text-lg font-bold text-slate-900">Veselty Inc.</span>
             <span class="text-sm text-slate-500">Free Plan</span>
@@ -29,7 +29,7 @@
       <nav class="flex-1 overflow-y-auto overflow-x-hidden">
         <ul class="p-4 space-y-2">
           <!-- Main Navigation -->
-          <li v-for="link in mainNavLinks" :key="link.path">
+          <li v-for="link in filteredMainNavLinks" :key="link.path">
             <NuxtLink
               :class="{
                 'justify-center': sidebarStore.isCollapsed,
@@ -78,12 +78,12 @@
           <!-- Other Links -->
           <div class="pt-4 mt-4 border-t border-slate-200">
             <h3
-              v-if="!sidebarStore.isCollapsed"
+              v-if="!sidebarStore.isCollapsed && filteredOtherLinks.length > 0"
               class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
             >
               Other
             </h3>
-            <li v-for="link in otherLinks" :key="link.path">
+            <li v-for="link in filteredOtherLinks" :key="link.path">
               <NuxtLink
                 :to="link.path"
                 class="flex items-center px-4 py-3 text-slate-600 rounded-xl hover:bg-emerald-50 hover:text-emerald-600 group transition-colors duration-200"
@@ -121,12 +121,12 @@
           <!-- Account Links -->
           <div class="pt-4 mt-4 border-t border-slate-200">
             <h3
-              v-if="!sidebarStore.isCollapsed"
+              v-if="!sidebarStore.isCollapsed && filteredAccountLinks.length > 0"
               class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
             >
               Account
             </h3>
-            <li v-for="link in accountLinks" :key="link.path">
+            <li v-for="link in filteredAccountLinks" :key="link.path">
               <NuxtLink
                 :to="link.path"
                 class="flex items-center px-4 py-3 text-slate-600 rounded-xl hover:bg-emerald-50 hover:text-emerald-600 group transition-colors duration-200"
@@ -232,85 +232,88 @@ nav::-webkit-scrollbar {
 </style>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed } from 'vue';
 import { debounce } from 'lodash-es';
+
 const sidebarStore = useSidebarStore();
+const authStore = useAuthStore(); // Add auth store
 const route = useRoute();
 
 const isMobile = ref(false);
 const isClient = computed(() => process.client);
 
-onMounted(() => {
-  if (isClient.value) {
-    checkMobileView();
-    window.addEventListener('resize', handleResize);
-  }
-});
-
-const checkMobileView = () => {
-  if (isClient.value) {
-    isMobile.value = window.innerWidth < 768;
-  }
-};
-
-const handleResize = debounce(() => {
-  if (isClient.value) {
-    checkMobileView();
-  }
-}, 200);
-
-onUnmounted(() => {
-  if (isClient.value) {
-    window.removeEventListener('resize', handleResize);
-  }
-});
-
-// Navigation Links
-const mainNavLinks = [
+// Define navigation items with role requirements
+const mainNavLinks = computed(() => [
   {
     name: "Dashboard",
     path: "/console",
     icon: "i-uil-apps",
+    roles: ["Admin"] // Both roles can access
   },
   {
     name: "Products",
     path: "/console/products",
     icon: "i-uil-box",
     badge: "24",
+    roles: ["Admin", "Moderator"]
   },
   {
     name: "Categories",
     path: "/console/categories",
     icon: "i-uil-layer-group",
+    roles: ["Admin", , "Moderator"]
   },
-];
+]);
 
-const otherLinks = [
+const otherLinks = computed(() => [
   {
     name: "Inquiries",
     path: "/console/inquiries",
     icon: "i-uil-comment-message",
     badge: "12",
+    roles: ["Admin", "Moderator"] // Both roles can access
   },
-];
+]);
 
-const accountLinks = [
+const accountLinks = computed(() => [
   {
     name: "Members",
     path: "/console/members",
     icon: "i-uil-users-alt",
+    roles: ["Admin"] // Only Admin can access
   },
   {
     name: "Settings",
     path: "/console/settings",
     icon: "i-uil-setting",
+    roles: ["Admin", "Moderator"] // Both roles can access
   },
   {
     name: "Feedback",
     path: "/console/feedback",
     icon: "i-uil-comment-alt-message",
+    roles: ["Admin"] // Both roles can access
   },
-];
+]);
+
+// Filter links based on user role
+const filteredMainNavLinks = computed(() => 
+  mainNavLinks.value.filter(link => 
+    link.roles.includes(authStore.role)
+  )
+);
+
+const filteredOtherLinks = computed(() => 
+  otherLinks.value.filter(link => 
+    link.roles.includes(authStore.role)
+  )
+);
+
+const filteredAccountLinks = computed(() => 
+  accountLinks.value.filter(link => 
+    link.roles.includes(authStore.role)
+  )
+);
 
 const isLinkActive = (path) => {
   if (path === '/console') {

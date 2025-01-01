@@ -5,14 +5,25 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
         <!-- Company Info -->
         <div class="col-span-1 md:col-span-2 lg:col-span-1">
-          <NuxtLink to="/" class="inline-block mb-6">
-            <img src="/images/logo.webp" alt="Logo" class="h-12 w-auto" />
+          <NuxtLink to="/" class="flex items-center space-x-3 py-3">
+            <div class="flex flex-col">
+              <img src="/images/logo.png" alt="Logo" class="h-12 w-auto" />
+            </div>
+            <div class="flex flex-col">
+              <span
+                class="text-xl font-bold leading-tight text-slate-900 uppercase"
+                >Samarasinghe</span
+              >
+              <span class="text-sm text-slate-600 font-semibold -mt-1 uppercase"
+                >Trade Center</span
+              >
+            </div>
           </NuxtLink>
           <address class="not-italic text-slate-600 space-y-3 text-sm">
-            <p>Address: 123 Industrial Zone,</p>
-            <p>Colombo, Sri Lanka 10115</p>
-            <p>Email: info@samarasinghetrade.com</p>
-            <p>Phone: (+94) 112-555-1234</p>
+            <p>Address: No. 22, 1st Floor, Supermarket Building,</p>
+            <p>Nugegoda, Sri Lanka</p>
+            <p>Email: info@stclk.com | stcs@sltnet.lk</p>
+            <p>Phone: +(94) 714 009 247 | +(94) 702 122 923</p>
           </address>
           <NuxtLink
             to="/contact"

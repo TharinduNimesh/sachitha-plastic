@@ -41,20 +41,8 @@
           <div class="flex flex-wrap items-center gap-4">
             <!-- Active Filters Display -->
             <div class="flex flex-wrap items-center gap-2">
-              <span v-if="!hasActiveFilters" class="text-sm text-slate-500"
-                >{{ filteredCategories.length }} categories found</span
-              >
-
-              <!-- Status Filter Tag -->
-              <span
-                v-if="selectedStatus"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-slate-600 rounded-lg text-sm font-medium"
-              >
-                <Icon name="i-uil-circle" class="w-4 h-4" />
-                {{ selectedStatus }}
-                <button @click="selectedStatus = ''" class="hover:text-slate-800">
-                  <Icon name="i-uil-times" class="w-4 h-4" />
-                </button>
+              <span v-if="!hasActiveFilters" class="text-sm text-slate-500">
+                {{ filteredCategories.length }} categories found
               </span>
 
               <!-- Clear All Filters -->
@@ -69,42 +57,6 @@
             </div>
 
             <div class="flex items-center gap-3 ml-auto">
-              <!-- Filter Button -->
-              <div class="relative" ref="filterMenuRef">
-                <button
-                  @click="isFilterMenuOpen = !isFilterMenuOpen"
-                  class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors duration-200"
-                >
-                  <Icon name="i-uil-filter" class="w-5 h-5 text-slate-600" />
-                  <span class="text-sm font-medium text-slate-700">Filters</span>
-                  <Icon
-                    :name="isFilterMenuOpen ? 'i-uil-angle-up' : 'i-uil-angle-down'"
-                    class="w-5 h-5 text-slate-600"
-                  />
-                </button>
-
-                <!-- Filter Dropdown -->
-                <div
-                  v-if="isFilterMenuOpen"
-                  class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-slate-200 p-4 z-10"
-                >
-                  <!-- Status Filter -->
-                  <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2"
-                      >Status</label
-                    >
-                    <select
-                      v-model="selectedStatus"
-                      class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-                    >
-                      <option value="">All Status</option>
-                      <option>Active</option>
-                      <option>Hidden</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
               <!-- Sort Button -->
               <div class="relative" ref="sortMenuRef">
                 <button
@@ -142,7 +94,7 @@
       </div>
 
       <!-- Categories Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-if="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <ConsoleCategoriesCard
           v-for="category in filteredCategories"
           :key="category.id"
@@ -151,130 +103,178 @@
           @delete="handleDelete(category)"
         />
       </div>
+
+      <!-- Loading State -->
+      <div v-if="loading" class="text-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto"></div>
+        <p class="mt-4 text-sm text-slate-600">Loading categories...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div v-if="!loading && filteredCategories.length === 0" class="text-center py-12">
+        <Icon name="i-uil-box" class="mx-auto h-12 w-12 text-slate-400" />
+        <h3 class="mt-2 text-sm font-semibold text-slate-900">No categories found</h3>
+        <p class="mt-1 text-sm text-slate-500">
+          {{ categories.length === 0 ? 'Get started by creating a new category.' : 'Try adjusting your search or filters.' }}
+        </p>
+      </div>
+
+      <!-- Modals -->
+      <CommonModalNewCategoryModal
+        v-model="showNewCategoryModal"
+        @category-created="handleCategoryCreated"
+      />
+      <CommonModalEditCategoryModal
+        v-if="showEditCategoryModal && selectedCategory"
+        v-model="showEditCategoryModal"
+        :category="selectedCategory"
+        @category-updated="handleCategoryUpdated"
+      />
+      <CommonModalDeleteCategoryModal
+        v-model="showDeleteModal"
+        :category="categoryToDelete"
+        @deleted="handleCategoryDeleted"
+      />
     </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { onClickOutside } from "@vueuse/core";
+import type { Database } from '~/types/database.types'
+import { onClickOutside } from '@vueuse/core'
 
-// Sample categories data
-const categories = ref([
-  {
-    id: 1,
-    title: "Machinery",
-    icon: "i-uil-processor",
-    color: "emerald",
-    productsCount: 24,
-    activeProducts: 18,
-    totalViews: 2453,
-    status: "Active",
-  },
-  {
-    id: 2,
-    title: "Household",
-    icon: "i-uil-home",
-    color: "blue",
-    productsCount: 15,
-    activeProducts: 12,
-    totalViews: 1876,
-    status: "Active",
-  },
-  {
-    id: 3,
-    title: "Industrial",
-    icon: "i-uil-building",
-    color: "orange",
-    productsCount: 31,
-    activeProducts: 28,
-    totalViews: 3254,
-    status: "Hidden",
-  },
-]);
+type Category = Database['public']['Tables']['categories']['Row']
 
-// Filter and Sort State
-const searchQuery = ref("");
-const selectedStatus = ref("");
-const sortBy = ref("name");
-const showNewCategoryModal = ref(false);
-const isFilterMenuOpen = ref(false);
-const isSortMenuOpen = ref(false);
+const client = useSupabaseClient<Database>()
+const toast = useToast()
 
-// Refs for click outside
-const filterMenuRef = ref(null);
-const sortMenuRef = ref(null);
+const loading = ref(true)
+const categories = ref<Category[]>([])
+const showNewCategoryModal = ref(false)
+const showEditCategoryModal = ref(false)
+const showDeleteModal = ref(false)
+const selectedCategory = ref<Category | null>(null)
+const categoryToDelete = ref<Category | null>(null)
 
-// Close menus when clicking outside
-onClickOutside(filterMenuRef, () => (isFilterMenuOpen.value = false));
-onClickOutside(sortMenuRef, () => (isSortMenuOpen.value = false));
+// Search and Filter
+const searchQuery = ref('')
+const isSortMenuOpen = ref(false)
+const sortBy = ref('newest')
+const sortMenuRef = ref()
 
-// Computed Properties
+// Close sort menu when clicking outside
+onClickOutside(sortMenuRef, () => {
+  isSortMenuOpen.value = false
+})
+
+// Sort options
+const sortOptions = [
+  { label: 'Newest First', value: 'newest', icon: 'i-uil-sort-amount-down' },
+  { label: 'Oldest First', value: 'oldest', icon: 'i-uil-sort-amount-up' },
+  { label: 'Name (A-Z)', value: 'name-asc', icon: 'i-uil-sort-alpha-down' },
+  { label: 'Name (Z-A)', value: 'name-desc', icon: 'i-uil-sort-alpha-up' },
+]
+
+// Computed properties
 const hasActiveFilters = computed(() => {
-  return selectedStatus.value !== "";
-});
+  return searchQuery.value.trim() !== ''
+})
 
 const filteredCategories = computed(() => {
-  let result = [...categories.value];
+  let result = [...categories.value]
 
   // Apply search filter
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    result = result.filter((category) =>
-      category.title.toLowerCase().includes(query)
-    );
-  }
-
-  // Apply status filter
-  if (selectedStatus.value) {
-    result = result.filter(
-      (category) => category.status === selectedStatus.value
-    );
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase()
+    result = result.filter(category => 
+      category.name.toLowerCase().includes(query)
+    )
   }
 
   // Apply sorting
   result.sort((a, b) => {
     switch (sortBy.value) {
-      case "name":
-        return a.title.localeCompare(b.title);
-      case "name-desc":
-        return b.title.localeCompare(a.title);
-      case "products":
-        return b.productsCount - a.productsCount;
-      case "views":
-        return b.totalViews - a.totalViews;
-      default:
-        return 0;
+      case 'oldest':
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      case 'name-asc':
+        return a.name.localeCompare(b.name)
+      case 'name-desc':
+        return b.name.localeCompare(a.name)
+      default: // newest
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     }
-  });
+  })
 
-  return result;
+  return result
+})
+
+// Fetch categories
+const fetchCategories = async () => {
+  try {
+    const { data, error } = await client
+      .from('categories')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    categories.value = data
+  } catch (error: any) {
+    toast.error('Failed to load categories')
+    console.error('Error fetching categories:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Handle category created
+const handleCategoryCreated = () => {
+  fetchCategories()
+}
+
+// Handle edit category
+const handleEdit = (category: Category) => {
+  selectedCategory.value = category
+  showEditCategoryModal.value = true
+}
+
+// Handle category updated
+const handleCategoryUpdated = () => {
+  selectedCategory.value = null
+  fetchCategories()
+}
+
+// Handle delete category
+const handleDelete = (category: Category) => {
+  categoryToDelete.value = category
+  showDeleteModal.value = true
+}
+
+// Handle category deleted
+const handleCategoryDeleted = () => {
+  categoryToDelete.value = null
+  fetchCategories()
+}
+
+// Clear all filters
+const clearFilters = () => {
+  searchQuery.value = ''
+  sortBy.value = 'newest'
+}
+
+// Handle sort option selection
+const selectSortOption = (value: string) => {
+  sortBy.value = value
+  isSortMenuOpen.value = false
+}
+
+watch(showNewCategoryModal, () => {
+  if (!showNewCategoryModal.value) {
+    fetchCategories()
+  }
 });
 
-// Sort options
-const sortOptions = ref([
-  { value: "name", label: "Name A-Z", icon: "i-uil-sort-amount-down" },
-  { value: "name-desc", label: "Name Z-A", icon: "i-uil-sort-amount-up" },
-  { value: "products", label: "Most Products", icon: "i-uil-box" },
-  { value: "views", label: "Most Views", icon: "i-uil-eye" },
-]);
-
-// Action handlers
-const handleEdit = (category) => {
-  console.log("Edit category:", category);
-};
-
-const handleDelete = (category) => {
-  console.log("Delete category:", category);
-};
-
-// Helper functions
-const clearFilters = () => {
-  selectedStatus.value = "";
-};
-
-const selectSortOption = (value) => {
-  sortBy.value = value;
-  isSortMenuOpen.value = false;
-};
+// Initial fetch
+onMounted(() => {
+  fetchCategories()
+})
 </script>
