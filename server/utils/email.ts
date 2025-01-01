@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 
 const getTemplate = async (template: string): Promise<string> => {
   const isDev = process.env.NODE_ENV === 'development';
-  const baseUrl = isDev ? 'http://localhost:3000' : process.env.VERCEL_URL;
+  const baseUrl = isDev ? 'http://localhost:3000' : process.env.APP_URL;
   
   try {
     const response = await fetch(`${baseUrl}/email-templates/${template}.html`);
