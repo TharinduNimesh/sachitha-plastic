@@ -1,6 +1,4 @@
 import nodemailer from 'nodemailer';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 
 // Create reusable transporter
 const transporter = nodemailer.createTransport({
@@ -13,6 +11,22 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const getTemplate = async (template: string): Promise<string> => {
+  const isDev = process.env.NODE_ENV === 'development';
+  const baseUrl = isDev ? 'http://localhost:3000' : process.env.VERCEL_URL;
+  
+  try {
+    const response = await fetch(`${baseUrl}/email-templates/${template}.html`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch template: ${response.statusText}`);
+    }
+    return await response.text();
+  } catch (error) {
+    console.error('Template fetch error:', error);
+    throw error;
+  }
+}
+
 interface SendMailOptions {
   to: string;
   subject: string;
@@ -22,9 +36,8 @@ interface SendMailOptions {
 
 export async function sendMail({ to, subject, template, context }: SendMailOptions) {
   try {
-    // Read template file
-    const templatePath = join(process.cwd(), 'public', 'email-templates', `${template}.html`);
-    let html = readFileSync(templatePath, 'utf-8');
+    // Fetch template
+    let html = await getTemplate(template);
 
     // Replace placeholders with context values
     Object.entries(context).forEach(([key, value]) => {
@@ -39,10 +52,9 @@ export async function sendMail({ to, subject, template, context }: SendMailOptio
       html,
     });
 
-    console.log('Message sent: %s', info.messageId);
-    return { success: true, messageId: info.messageId };
+    return info;
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Send mail error:', error);
     throw error;
   }
 }
