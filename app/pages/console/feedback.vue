@@ -325,4 +325,12 @@ const handleSubmit = async () => {
     isSubmitting.value = false
   }
 }
+
+// Add meta information for SEO
+useHead({
+  title: 'Send Feedback - Console',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+})
 </script>

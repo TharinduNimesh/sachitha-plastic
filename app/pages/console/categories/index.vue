@@ -277,4 +277,12 @@ watch(showNewCategoryModal, () => {
 onMounted(() => {
   fetchCategories()
 })
+
+// Add meta information for SEO
+useHead({
+  title: 'Categories - Console',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+})
 </script>

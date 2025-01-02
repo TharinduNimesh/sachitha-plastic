@@ -147,6 +147,14 @@ const passwordForm = ref({
 
 const { error: toastError, success: toastSuccess } = useToast()
 
+// Add meta information for SEO
+useHead({
+  title: 'Account Settings - Console',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+})
+
 // Load user data on component mount
 onMounted(async () => {
   try {

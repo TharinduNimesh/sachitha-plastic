@@ -642,4 +642,12 @@ const isAccountSetupped = computed(() => {
 definePageMeta({
   layout: "console",
 });
+
+// Add meta information for SEO
+useHead({
+  title: 'Dashboard - Console',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+})
 </script>

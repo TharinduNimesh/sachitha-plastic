@@ -496,4 +496,12 @@ onMounted(async () => {
     fetchCategories()
   ])
 })
+
+// Add meta information for SEO
+useHead({
+  title: 'Products - Console',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+})
 </script>
