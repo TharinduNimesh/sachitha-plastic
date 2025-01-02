@@ -418,6 +418,33 @@
   </NuxtLayout>
 </template>
 
+<script setup lang="ts">
+useHead({
+  title: 'Services - Samarasinghe Trade Center',
+  meta: [
+    {
+      name: 'description',
+      content: 'Professional plastic manufacturing and recycling services in Sri Lanka. Expert solutions in product manufacturing, recycling machinery, and industrial consulting.'
+    },
+    {
+      name: 'keywords',
+      content: 'plastic manufacturing services, recycling services, industrial consulting, machinery maintenance, Sri Lanka'
+    },
+    { name: 'robots', content: 'index, follow' },
+    { 
+      name: 'canonical', 
+      content: 'https://samarasinghetrade.com/services' 
+    }
+  ],
+  link: [
+    {
+      rel: 'canonical',
+      href: 'https://samarasinghetrade.com/services'
+    }
+  ]
+})
+</script>
+
 <style scoped>
 .blob-1 {
   position: absolute;

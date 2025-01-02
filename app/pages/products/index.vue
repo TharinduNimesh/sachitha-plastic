@@ -350,8 +350,8 @@ watch(viewMode, (newMode) => {
 // Fetch products
 const fetchProducts = async () => {
   try {
-    loading.value = true
-    const client = useSupabaseClient<Database>()
+    loading.value = true;
+    const client = useSupabaseClient<Database>();
     const { data, error } = await client
       .from('products')
       .select(`
@@ -359,21 +359,21 @@ const fetchProducts = async () => {
         category:categories(name)
       `)
       .eq('status', 'Active')
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false });
 
-    if (error) throw error
+    if (error) throw error;
 
     products.value = data?.map(product => ({
       ...product,
-      category: product.category?.name || 'Uncategorized'
-    })) || []
+      category: product.category?.name || 'Uncategorized',
+    })) || [];
   } catch (error) {
-    console.error('Error fetching products:', error)
-    products.value = []
+    console.error('Error fetching products:', error);
+    products.value = [];
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // Computed
 const hasActiveFilters = computed(() => Boolean(selectedCategory.value))
@@ -444,6 +444,31 @@ const latestProducts = computed(() => {
       }
     })
     .slice(0, 10)
+})
+
+useHead({
+  title: 'Products - Samarasinghe Trade Center',
+  meta: [
+    {
+      name: 'description',
+      content: 'Explore our wide range of high-quality plastic products and recycling machinery. From household items to industrial solutions, discover sustainable products made in Sri Lanka.'
+    },
+    {
+      name: 'keywords',
+      content: 'plastic products, recycling machinery, household items, industrial solutions, Sri Lanka, sustainable products'
+    },
+    { name: 'robots', content: 'index, follow' },
+    { 
+      name: 'canonical', 
+      content: 'https://samarasinghetrade.com/products' 
+    }
+  ],
+  link: [
+    {
+      rel: 'canonical',
+      href: 'https://samarasinghetrade.com/products'
+    }
+  ]
 })
 </script>
 

@@ -220,24 +220,19 @@ const prevImage = () => {
 };
 
 // Fetch similar products
-const fetchSimilarProducts = async (
-  categoryId: number,
-  currentProductId: number
-) => {
+const fetchSimilarProducts = async (categoryId: number, currentProductId: number) => {
   try {
     const client = useSupabaseClient<Database>();
     const { data, error } = await client
-      .from("products")
-      .select(
-        `
+      .from('products')
+      .select(`
         *,
         category:categories(name),
         images:product_images()
-      `
-      )
-      .eq("category_id", categoryId)
-      .eq("status", "Active")
-      .neq("id", currentProductId)
+      `)
+      .eq('category_id', categoryId)
+      .eq('status', 'Active')
+      .neq('id', currentProductId)
       .limit(10);
 
     if (error) throw error;
@@ -247,7 +242,7 @@ const fetchSimilarProducts = async (
       category: product.category.name,
     }));
   } catch (error) {
-    console.error("Error fetching similar products:", error);
+    console.error('Error fetching similar products:', error);
     similarProducts.value = [];
   }
 };
