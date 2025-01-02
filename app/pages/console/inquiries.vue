@@ -381,10 +381,10 @@ const handleResolve = async (inquiry: InquiryWithStatus) => {
   try {
     const { error: resolveError } = await supabase
       .from('inquiry_status')
-      .upsert({
-        inquiry_id: inquiry.id,
+      .update({
         status: 'Resolved'
-      });
+      })
+      .eq('inquiry_id', inquiry.id);
     
     if (resolveError) throw resolveError;
 

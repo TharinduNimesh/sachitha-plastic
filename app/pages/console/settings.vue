@@ -145,6 +145,8 @@ const passwordForm = ref({
   error: null as string | null,
 })
 
+const { error: toastError, success: toastSuccess } = useToast()
+
 // Load user data on component mount
 onMounted(async () => {
   try {
@@ -185,15 +187,16 @@ const saveChanges = async () => {
 
     if (error) throw error
 
-    // Refresh user data in store
-    await authStore.fetchUser()
+    // Update local auth store data
+    authStore.$patch({
+      name: user.value.name
+    })
+    
     isEditing.value = false
-
-    // Show success message
-    useToast().success('Profile updated successfully')
+    toastSuccess('Profile updated successfully')
   } catch (error: any) {
     console.error('Error saving changes:', error)
-    useToast().error(error.message || 'Failed to update profile')
+    toastError(error.message || 'Failed to update profile')
   }
 }
 
@@ -224,10 +227,10 @@ const changePassword = async () => {
     showPasswordModal.value = false
 
     // Show success message
-    useToast().success('Password updated successfully')
+    toastSuccess('Password updated successfully')
   } catch (error: any) {
     passwordForm.value.error = error.message || 'Failed to update password'
-    useToast().error(passwordForm.value.error as string)
+    toastError(passwordForm.value.error)
   } finally {
     passwordForm.value.loading = false
   }

@@ -15,7 +15,7 @@
         </button>
 
         <!-- Search Bar -->
-        <div class="flex-1 max-w-2xl">
+        <!-- <div class="flex-1 max-w-2xl">
           <div class="relative">
             <input
               type="text"
@@ -27,13 +27,13 @@
               class="absolute left-3 top-2.5 w-5 h-5 text-slate-400"
             />
           </div>
-        </div>
+        </div> -->
       </div>
 
       <!-- Right Actions -->
       <div class="flex items-center space-x-2 md:space-x-4 ml-4">
         <!-- Export & Add Widget Buttons (Hidden on mobile) -->
-        <div class="hidden md:flex rounded-lg border border-slate-200 divide-x">
+        <!-- <div class="hidden md:flex rounded-lg border border-slate-200 divide-x">
           <button
             class="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
           >
@@ -48,7 +48,6 @@
           </button>
         </div>
 
-        <!-- Notifications -->
         <button
           class="relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-50 transition-colors"
         >
@@ -56,7 +55,7 @@
           <span
             class="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full"
           ></span>
-        </button>
+        </button> -->
 
         <!-- Profile Dropdown -->
         <div class="relative">
@@ -64,8 +63,8 @@
             class="flex items-center space-x-1 p-1 rounded-lg hover:bg-slate-50 transition-colors"
           >
             <img
-              src="https://ui-avatars.com/api/?name=Jeivine+Kief&background=10B981&color=fff"
-              alt="Jeivine Kief"
+              :src="`https://ui-avatars.com/api/?name=${auth.name}&background=10B981&color=fff`"
+              :alt="auth.name as string"
               class="w-8 h-8 rounded-full"
             />
             <Icon
@@ -83,4 +82,5 @@
 import { useSidebarStore } from "~/stores/sidebar";
 
 const sidebarStore = useSidebarStore();
+const auth = useAuthStore();
 </script>

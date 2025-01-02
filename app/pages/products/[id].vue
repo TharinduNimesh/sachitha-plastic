@@ -58,7 +58,7 @@
               <template v-if="allImages.length > 1">
                 <button
                   @click="prevImage"
-                  class="absolute left-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/80 hover:bg-white transition-colors duration-300"
+                  class="w-12 h-12 flex justify-center items-center absolute left-2 top-1/2 transform -translate-y-1/2 rounded-full bg-white/80 hover:bg-white transition-colors duration-300"
                 >
                   <Icon
                     name="heroicons:chevron-left"
@@ -67,7 +67,7 @@
                 </button>
                 <button
                   @click="nextImage"
-                  class="absolute right-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/80 hover:bg-white transition-colors duration-300"
+                  class="w-12 h-12 flex justify-center items-center absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-white/80 hover:bg-white transition-colors duration-300"
                 >
                   <Icon
                     name="heroicons:chevron-right"
