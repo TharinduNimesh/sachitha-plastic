@@ -6,7 +6,7 @@
         'md:fixed',
         sidebarStore.sidebarWidth,
         { '-translate-x-full': !sidebarStore.isMobileOpen && isMobile },
-        { 'translate-x-0': sidebarStore.isMobileOpen || !isMobile }
+        { 'translate-x-0': sidebarStore.isMobileOpen || !isMobile },
       ]"
     >
       <!-- Logo Section -->
@@ -121,7 +121,9 @@
           <!-- Account Links -->
           <div class="pt-4 mt-4 border-t border-slate-200">
             <h3
-              v-if="!sidebarStore.isCollapsed && filteredAccountLinks.length > 0"
+              v-if="
+                !sidebarStore.isCollapsed && filteredAccountLinks.length > 0
+              "
               class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"
             >
               Account
@@ -172,19 +174,20 @@
           :class="{ 'justify-center': sidebarStore.isCollapsed }"
         >
           <img
-            src="https://ui-avatars.com/api/?name=Jeivine+Kief&background=10B981&color=fff"
-            alt="Jeivine Kief"
+            :src="`https://ui-avatars.com/api/?name=${authStore.name}&background=10B981&color=fff`"
+            :alt="authStore.name"
             class="w-8 h-8 rounded-full"
           />
           <div v-if="!sidebarStore.isCollapsed" class="flex-1 min-w-0 ml-3">
             <p class="text-sm font-medium text-slate-900 truncate">
-              Jeivine Kief
+              {{ authStore.name }}
             </p>
-            <p class="text-xs text-slate-500 truncate">Administrator</p>
+            <p class="text-xs text-slate-500 truncate">{{ authStore.role }}</p>
           </div>
           <button
             v-if="!sidebarStore.isCollapsed"
             class="ml-auto p-1 text-slate-400 hover:text-slate-500 rounded-lg hover:bg-slate-100 transition-colors duration-200"
+            @click="logout"
           >
             <Icon name="i-uil-signout" class="w-5 h-5" />
           </button>
@@ -232,8 +235,8 @@ nav::-webkit-scrollbar {
 </style>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { debounce } from 'lodash-es';
+import { ref, computed } from "vue";
+import { debounce } from "lodash-es";
 
 const sidebarStore = useSidebarStore();
 const authStore = useAuthStore(); // Add auth store
@@ -248,20 +251,20 @@ const mainNavLinks = computed(() => [
     name: "Dashboard",
     path: "/console",
     icon: "i-uil-apps",
-    roles: ["Admin"] // Both roles can access
+    roles: ["Admin"], // Both roles can access
   },
   {
     name: "Products",
     path: "/console/products",
     icon: "i-uil-box",
     badge: "24",
-    roles: ["Admin", "Moderator"]
+    roles: ["Admin", "Moderator"],
   },
   {
     name: "Categories",
     path: "/console/categories",
     icon: "i-uil-layer-group",
-    roles: ["Admin", , "Moderator"]
+    roles: ["Admin", , "Moderator"],
   },
 ]);
 
@@ -271,7 +274,7 @@ const otherLinks = computed(() => [
     path: "/console/inquiries",
     icon: "i-uil-comment-message",
     badge: "12",
-    roles: ["Admin", "Moderator"] // Both roles can access
+    roles: ["Admin", "Moderator"], // Both roles can access
   },
 ]);
 
@@ -280,45 +283,47 @@ const accountLinks = computed(() => [
     name: "Members",
     path: "/console/members",
     icon: "i-uil-users-alt",
-    roles: ["Admin"] // Only Admin can access
+    roles: ["Admin"], // Only Admin can access
   },
   {
     name: "Settings",
     path: "/console/settings",
     icon: "i-uil-setting",
-    roles: ["Admin", "Moderator"] // Both roles can access
+    roles: ["Admin", "Moderator"], // Both roles can access
   },
   {
     name: "Feedback",
     path: "/console/feedback",
     icon: "i-uil-comment-alt-message",
-    roles: ["Admin"] // Both roles can access
+    roles: ["Admin"], // Both roles can access
   },
 ]);
 
 // Filter links based on user role
-const filteredMainNavLinks = computed(() => 
-  mainNavLinks.value.filter(link => 
-    link.roles.includes(authStore.role)
-  )
+const filteredMainNavLinks = computed(() =>
+  mainNavLinks.value.filter((link) => link.roles.includes(authStore.role))
 );
 
-const filteredOtherLinks = computed(() => 
-  otherLinks.value.filter(link => 
-    link.roles.includes(authStore.role)
-  )
+const filteredOtherLinks = computed(() =>
+  otherLinks.value.filter((link) => link.roles.includes(authStore.role))
 );
 
-const filteredAccountLinks = computed(() => 
-  accountLinks.value.filter(link => 
-    link.roles.includes(authStore.role)
-  )
+const filteredAccountLinks = computed(() =>
+  accountLinks.value.filter((link) => link.roles.includes(authStore.role))
 );
+
+const logout = async () => {
+  const supabase = useSupabaseClient();
+  await supabase.auth.signOut();
+  authStore.clearUser();
+
+  navigateTo("/auth/sign-in");
+}
 
 const isLinkActive = (path) => {
-  if (path === '/console') {
-    return route.path === path
+  if (path === "/console") {
+    return route.path === path;
   }
-  return route.path.startsWith(path)
-}
+  return route.path.startsWith(path);
+};
 </script>

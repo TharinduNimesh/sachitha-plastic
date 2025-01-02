@@ -58,7 +58,7 @@
               <template v-if="allImages.length > 1">
                 <button
                   @click="prevImage"
-                  class="absolute left-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/80 hover:bg-white transition-colors duration-300"
+                  class="w-12 h-12 flex justify-center items-center absolute left-2 top-1/2 transform -translate-y-1/2 rounded-full bg-white/80 hover:bg-white transition-colors duration-300"
                 >
                   <Icon
                     name="heroicons:chevron-left"
@@ -67,7 +67,7 @@
                 </button>
                 <button
                   @click="nextImage"
-                  class="absolute right-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/80 hover:bg-white transition-colors duration-300"
+                  class="w-12 h-12 flex justify-center items-center absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-white/80 hover:bg-white transition-colors duration-300"
                 >
                   <Icon
                     name="heroicons:chevron-right"
@@ -220,24 +220,19 @@ const prevImage = () => {
 };
 
 // Fetch similar products
-const fetchSimilarProducts = async (
-  categoryId: number,
-  currentProductId: number
-) => {
+const fetchSimilarProducts = async (categoryId: number, currentProductId: number) => {
   try {
     const client = useSupabaseClient<Database>();
     const { data, error } = await client
-      .from("products")
-      .select(
-        `
+      .from('products')
+      .select(`
         *,
         category:categories(name),
         images:product_images()
-      `
-      )
-      .eq("category_id", categoryId)
-      .eq("status", "Active")
-      .neq("id", currentProductId)
+      `)
+      .eq('category_id', categoryId)
+      .eq('status', 'Active')
+      .neq('id', currentProductId)
       .limit(10);
 
     if (error) throw error;
@@ -247,7 +242,7 @@ const fetchSimilarProducts = async (
       category: product.category.name,
     }));
   } catch (error) {
-    console.error("Error fetching similar products:", error);
+    console.error('Error fetching similar products:', error);
     similarProducts.value = [];
   }
 };

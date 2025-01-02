@@ -43,8 +43,16 @@
       >
         <!-- Status Indicator -->
         <div class="flex items-center space-x-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span class="text-sm text-slate-600">In Stock</span>
+          <span 
+            class="w-2 h-2 rounded-full"
+            :class="{
+              'bg-emerald-500': product.availability === 'InStock',
+              'bg-red-500': product.availability === 'OutOfStock'
+            }"
+          ></span>
+          <span class="text-sm text-slate-600">
+            {{ product.availability === 'InStock' ? 'In Stock' : 'Out of Stock' }}
+          </span>
         </div>
 
         <!-- Learn More Link -->
@@ -70,6 +78,7 @@ interface Product {
   primary_image: string;
   category_id: number;
   category: string;
+  availability: 'InStock' | 'OutOfStock';  // Added this line
 }
 
 const props = defineProps<{

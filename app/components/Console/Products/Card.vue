@@ -73,32 +73,48 @@
       
       <!-- Meta Info -->
       <div class="mt-4 flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <span class="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-slate-50">
-            <Icon name="i-uil-eye" class="w-4 h-4 text-slate-500" />
-            <span class="text-sm font-medium text-slate-600">2.4k</span>
-          </span>
-          <span class="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-slate-50">
-            <Icon name="i-uil-shopping-cart" class="w-4 h-4 text-slate-500" />
-            <span class="text-sm font-medium text-slate-600">156</span>
-          </span>
-        </div>
-        <span class="text-lg font-semibold text-emerald-600">$299.00</span>
+        <span class="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-slate-50">
+          <Icon name="i-uil-eye" class="w-4 h-4 text-slate-500" />
+          <span class="text-sm font-medium text-slate-600">{{ views }}</span>
+        </span>
+        <span 
+          :class="[
+            'px-3 py-1 rounded-lg text-sm font-medium',
+            availability === 'InStock' 
+              ? 'bg-emerald-50 text-emerald-600'
+              : 'bg-orange-50 text-orange-600'
+          ]"
+        >
+          {{ formatAvailability(availability) }}
+        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { Database } from '~/types/database.types'
+
+type Availability = Database['public']['Enums']['Availability']
+
 interface Props {
-  id: number; // Add id to props
+  id: number;
   title: string;
   category: string;
   status: string;
   image: string;
+  availability: Availability;
+  views?: number;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  views: 0
+});
+
+const formatAvailability = (availability: Availability) => {
+  return availability === 'InStock' ? 'In Stock' : 'Out of Stock';
+};
+
 const router = useRouter();
 
 // Navigation helper

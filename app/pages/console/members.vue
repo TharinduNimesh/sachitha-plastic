@@ -94,6 +94,14 @@ const { error: toastError, success: toastSuccess } = useToast();
 // Add user ref to check current user
 const user = useSupabaseUser();
 
+// Add meta information for SEO
+useHead({
+  title: 'Members - Console',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+})
+
 // Load members and pending invites
 const loadMembersAndInvites = async () => {
   try {

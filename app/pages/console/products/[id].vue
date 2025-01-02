@@ -633,4 +633,12 @@ const fetchProductData = async () => {
 
 // Add tracking of original images
 const originalImages = ref<Array<{ url: string; isPrimary: boolean }>>([]);
+
+// Add meta information for SEO
+useHead({
+  title: computed(() => product.name ? `Edit ${product.name} - Console` : 'Edit Product - Console'),
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+})
 </script>

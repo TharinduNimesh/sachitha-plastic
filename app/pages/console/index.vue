@@ -414,7 +414,7 @@ const { data: combinedDashboardData, pending: combinedDashboardLoading } = await
       // Pending inquiries
       supabase.from('inquiry_status')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending'),
+        .eq('status', 'Pending'),
       // Recent products
       supabase.from('products')
         .select('id, name, created_at')
@@ -642,4 +642,12 @@ const isAccountSetupped = computed(() => {
 definePageMeta({
   layout: "console",
 });
+
+// Add meta information for SEO
+useHead({
+  title: 'Dashboard - Console',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+})
 </script>

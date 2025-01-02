@@ -180,6 +180,8 @@
             :category="product.category.name"
             :status="product.status === 'Hidden' ? 'Archived' : product.status"
             :image="product.primary_image || ''"
+            :availability="product.availability"
+            :views="product.statistics?.views || 0"
             @edit="handleEdit(product)"
             @preview="handlePreview(product)"
             @archive="handleDelete(product)"
@@ -335,13 +337,18 @@ const fetchProducts = async () => {
       .from('products')
       .select(`
         *,
-        category:categories(*)
+        category:categories(*),
+        statistics:product_statistics(views)
       `)
       .order('created_at', { ascending: false })
 
     if (supabaseError) throw supabaseError
 
-    products.value = data || []
+    // Transform the data to combine statistics
+    products.value = data?.map(product => ({
+      ...product,
+      statistics: product.statistics?.[0] || { views: 0 }
+    })) || []
   } catch (e) {
     console.error('Error fetching products:', e)
     error.value = 'Failed to load products. Please try again.'
@@ -488,5 +495,13 @@ onMounted(async () => {
     fetchProducts(),
     fetchCategories()
   ])
+})
+
+// Add meta information for SEO
+useHead({
+  title: 'Products - Console',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
 })
 </script>

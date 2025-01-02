@@ -171,6 +171,14 @@ const isNavigating = ref(false);
 const isFormSubmitted = ref(false);
 const isSubmitting = ref(false);
 
+// Add meta information for SEO
+useHead({
+  title: 'New Product - Console',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+})
+
 // Initialize product state
 const product = reactive<ProductDraft>({
   name: "",

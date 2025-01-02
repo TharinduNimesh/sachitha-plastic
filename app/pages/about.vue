@@ -352,6 +352,33 @@
   </NuxtLayout>
 </template>
 
+<script setup lang="ts">
+useHead({
+  title: 'About Us - Samarasinghe Trade Center',
+  meta: [
+    {
+      name: 'description',
+      content: 'Learn about Samarasinghe Trade Center\'s 41+ years of excellence in plastic manufacturing and recycling solutions. ISO certified company committed to quality and sustainability.'
+    },
+    {
+      name: 'keywords',
+      content: 'about STC, plastic manufacturing history, company profile, ISO certification, Sri Lanka, sustainable manufacturing'
+    },
+    { name: 'robots', content: 'index, follow' },
+    { 
+      name: 'canonical', 
+      content: 'https://samarasinghetrade.com/about' 
+    }
+  ],
+  link: [
+    {
+      rel: 'canonical',
+      href: 'https://samarasinghetrade.com/about'
+    }
+  ]
+})
+</script>
+
 <style scoped>
 .blob-1 {
   position: absolute;
