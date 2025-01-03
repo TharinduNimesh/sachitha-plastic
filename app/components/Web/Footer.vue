@@ -2,7 +2,7 @@
   <footer class="bg-white border-t border-slate-200 pt-16 pb-8">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Footer Content -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
         <!-- Company Info -->
         <div class="col-span-1 md:col-span-2 lg:col-span-1">
           <NuxtLink to="/" class="flex items-center space-x-3 py-3">
@@ -47,7 +47,7 @@
         </div>
 
         <!-- Help Links -->
-        <div>
+        <!-- <div>
           <h3 class="font-semibold text-slate-900 mb-4">Help</h3>
           <ul class="space-y-3 text-sm">
             <li>
@@ -84,7 +84,7 @@
               >
             </li>
           </ul>
-        </div>
+        </div> -->
 
         <!-- About Us Links -->
         <div>

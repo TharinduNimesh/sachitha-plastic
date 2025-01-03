@@ -414,7 +414,7 @@
 
     <!-- Additional Sections -->
     <WebCallToAction />
-    <WebGallery />
+    <!-- <WebGallery /> -->
   </NuxtLayout>
 </template>
 
