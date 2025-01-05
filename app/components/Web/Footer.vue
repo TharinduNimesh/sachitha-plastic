@@ -92,13 +92,6 @@
           <ul class="space-y-3 text-sm">
             <li>
               <NuxtLink
-                to="/about"
-                class="text-slate-600 hover:text-emerald-600"
-                >Our Story</NuxtLink
-              >
-            </li>
-            <li>
-              <NuxtLink
                 to="/store"
                 class="text-slate-600 hover:text-emerald-600"
                 >Visit Our Store</NuxtLink
@@ -109,13 +102,6 @@
                 to="/contact"
                 class="text-slate-600 hover:text-emerald-600"
                 >Contact Us</NuxtLink
-              >
-            </li>
-            <li>
-              <NuxtLink
-                to="/account"
-                class="text-slate-600 hover:text-emerald-600"
-                >Account</NuxtLink
               >
             </li>
           </ul>
@@ -150,7 +136,7 @@
           class="flex flex-col md:flex-row justify-between items-center gap-4"
         >
           <!-- Social Links -->
-          <div class="flex items-center space-x-4">
+          <!-- <div class="flex items-center space-x-4">
             <a
               href="#"
               class="w-10 h-10 flex items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:border-emerald-600 hover:text-emerald-600 transition-colors duration-300"
@@ -201,7 +187,7 @@
                 />
               </svg>
             </a>
-          </div>
+          </div> -->
 
           <!-- Copyright -->
           <p class="text-sm text-slate-600">
