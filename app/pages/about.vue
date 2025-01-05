@@ -196,7 +196,7 @@
           <!-- Image Column -->
           <div class="relative rounded-2xl overflow-hidden lg:order-2">
             <img
-              src="/images/company-overview.jpg"
+              src="/images/meeting.jpg"
               alt="Company Overview"
               class="w-full h-full object-cover transform transition-transform duration-700 hover:scale-105"
             />
