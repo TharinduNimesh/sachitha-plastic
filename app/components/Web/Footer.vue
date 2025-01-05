@@ -2,7 +2,7 @@
   <footer class="bg-white border-t border-slate-200 pt-16 pb-8">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Footer Content -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
         <!-- Company Info -->
         <div class="col-span-1 md:col-span-2 lg:col-span-1">
           <NuxtLink to="/" class="flex items-center space-x-3 py-3">
@@ -47,7 +47,7 @@
         </div>
 
         <!-- Help Links -->
-        <div>
+        <!-- <div>
           <h3 class="font-semibold text-slate-900 mb-4">Help</h3>
           <ul class="space-y-3 text-sm">
             <li>
@@ -84,19 +84,12 @@
               >
             </li>
           </ul>
-        </div>
+        </div> -->
 
         <!-- About Us Links -->
         <div>
           <h3 class="font-semibold text-slate-900 mb-4">About us</h3>
           <ul class="space-y-3 text-sm">
-            <li>
-              <NuxtLink
-                to="/about"
-                class="text-slate-600 hover:text-emerald-600"
-                >Our Story</NuxtLink
-              >
-            </li>
             <li>
               <NuxtLink
                 to="/store"
@@ -109,13 +102,6 @@
                 to="/contact"
                 class="text-slate-600 hover:text-emerald-600"
                 >Contact Us</NuxtLink
-              >
-            </li>
-            <li>
-              <NuxtLink
-                to="/account"
-                class="text-slate-600 hover:text-emerald-600"
-                >Account</NuxtLink
               >
             </li>
           </ul>
@@ -150,7 +136,7 @@
           class="flex flex-col md:flex-row justify-between items-center gap-4"
         >
           <!-- Social Links -->
-          <div class="flex items-center space-x-4">
+          <!-- <div class="flex items-center space-x-4">
             <a
               href="#"
               class="w-10 h-10 flex items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:border-emerald-600 hover:text-emerald-600 transition-colors duration-300"
@@ -201,7 +187,7 @@
                 />
               </svg>
             </a>
-          </div>
+          </div> -->
 
           <!-- Copyright -->
           <p class="text-sm text-slate-600">

@@ -6,7 +6,7 @@
     <WebCategorySlider />
     <WebCallToAction />
     <WebProducts />
-    <WebGallery />
+    <!-- <WebGallery /> -->
   </NuxtLayout>
 </template>
 

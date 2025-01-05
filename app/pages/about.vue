@@ -107,7 +107,7 @@
             </div>
 
             <!-- Certifications -->
-            <div class="mt-12">
+            <!-- <div class="mt-12">
               <div class="text-center mb-8">
                 <h3 class="text-2xl font-bold text-slate-900">
                   International Standards
@@ -120,7 +120,6 @@
               <div
                 class="flex flex-col md:flex-row items-center justify-center gap-8"
               >
-                <!-- ISO 9001 -->
                 <div class="group w-full md:w-72 relative overflow-hidden">
                   <div
                     class="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -156,7 +155,6 @@
                   </div>
                 </div>
 
-                <!-- ISO 14001 -->
                 <div class="group w-full md:w-72 relative overflow-hidden">
                   <div
                     class="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -192,13 +190,13 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
           </div>
 
           <!-- Image Column -->
           <div class="relative rounded-2xl overflow-hidden lg:order-2">
             <img
-              src="/images/company-overview.jpg"
+              src="/images/meeting.jpg"
               alt="Company Overview"
               class="w-full h-full object-cover transform transition-transform duration-700 hover:scale-105"
             />
@@ -222,19 +220,59 @@
         <h2 class="text-2xl font-bold text-center mb-8">Our Quarters</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-            <img src="/images/logo.png" alt="Samarasinghe Trade Center" class="h-24 w-auto mx-auto mb-4" />
+            <img
+              src="/images/logo.png"
+              alt="Samarasinghe Trade Center"
+              class="h-24 w-auto mx-auto mb-4"
+            />
             <h3 class="text-xl font-semibold">Samarasinghe Trade Center</h3>
-            <p>Our main office oversees strategic planning, customer service, and operational management, driving innovation and quality in everything we do.</p>
+            <p>
+              Our main office oversees strategic planning, customer service, and
+              operational management, driving innovation and quality in
+              everything we do.
+            </p>
+
+            <h3 class="text-xl font-semibold mt-4">Address</h3>
+            <p>
+              No. 22, 1st Floor, Supermarket Building, Nugegoda, Sri
+              Lanka
+            </p>
           </div>
           <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-            <img src="/images/sd-industries.webp" alt="SD Industries" class="h-24 w-auto mx-auto mb-4" />
+            <img
+              src="/images/sd-industries.webp"
+              alt="SD Industries"
+              class="h-24 w-auto mx-auto mb-4"
+            />
             <h3 class="text-xl font-semibold">SD Industries</h3>
-            <p>Focused on supporting the plastic manufacturing process with innovative solutions and essential industry resources.</p>
+            <p>
+              Focused on supporting the plastic manufacturing process with
+              innovative solutions and essential industry resources.
+            </p>
+
+            <h3 class="text-xl font-semibold mt-4">Address</h3>
+            <p>
+              No. 29, Stage 2 Temple Burg Industrial Zone, Panagoda, Sri
+              Lanka
+            </p>
           </div>
           <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-            <img src="/images/sachitha-plastic-manufacture.webp" alt="Sachitha Plastic Manufacture" class="h-24 w-auto mx-auto mb-4" />
+            <img
+              src="/images/sachitha-plastic-manufacture.webp"
+              alt="Sachitha Plastic Manufacture"
+              class="h-24 w-auto mx-auto mb-4"
+            />
             <h3 class="text-xl font-semibold">Sachitha Plastic Manufacture</h3>
-            <p>A subsidiary specializing in high-quality plastic production, combining advanced techniques with eco-friendly practices.</p>
+            <p>
+              A subsidiary specializing in high-quality plastic production,
+              combining advanced techniques with eco-friendly practices.
+            </p>
+
+            <h3 class="text-xl font-semibold mt-4">Address</h3>
+            <p>
+              No. 6 & 7, State 2 Temple Burg Industrial Zone, Panagoda, Sri
+              Lanka
+            </p>
           </div>
         </div>
       </div>
@@ -348,35 +386,37 @@
 
     <!-- Additional Sections -->
     <WebCallToAction />
-    <WebGallery />
+    <!-- <WebGallery /> -->
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
 useHead({
-  title: 'About Us - Samarasinghe Trade Center',
+  title: "About Us - Samarasinghe Trade Center",
   meta: [
     {
-      name: 'description',
-      content: 'Learn about Samarasinghe Trade Center\'s 41+ years of excellence in plastic manufacturing and recycling solutions. ISO certified company committed to quality and sustainability.'
+      name: "description",
+      content:
+        "Learn about Samarasinghe Trade Center's 41+ years of excellence in plastic manufacturing and recycling solutions. ISO certified company committed to quality and sustainability.",
     },
     {
-      name: 'keywords',
-      content: 'about STC, plastic manufacturing history, company profile, ISO certification, Sri Lanka, sustainable manufacturing'
+      name: "keywords",
+      content:
+        "about STC, plastic manufacturing history, company profile, ISO certification, Sri Lanka, sustainable manufacturing",
     },
-    { name: 'robots', content: 'index, follow' },
-    { 
-      name: 'canonical', 
-      content: 'https://samarasinghetrade.com/about' 
-    }
+    { name: "robots", content: "index, follow" },
+    {
+      name: "canonical",
+      content: "https://samarasinghetrade.com/about",
+    },
   ],
   link: [
     {
-      rel: 'canonical',
-      href: 'https://samarasinghetrade.com/about'
-    }
-  ]
-})
+      rel: "canonical",
+      href: "https://samarasinghetrade.com/about",
+    },
+  ],
+});
 </script>
 
 <style scoped>

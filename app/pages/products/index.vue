@@ -145,13 +145,13 @@
               <div class="flex gap-2">
                 <button
                   @click="scrollLeft"
-                  class="p-3 rounded-full border border-slate-200 hover:bg-emerald-50 transition-colors duration-300"
+                  class="w-12 h-12 flex justify-center items-center rounded-full border border-slate-200 hover:bg-emerald-50 transition-colors duration-300"
                 >
                   <Icon name="heroicons:chevron-left" class="w-6 h-6 text-slate-600" />
                 </button>
                 <button
                   @click="scrollRight"
-                  class="p-3 rounded-full border border-slate-200 hover:bg-emerald-50 transition-colors duration-300"
+                  class="w-12 h-12 flex justify-center items-center rounded-full border border-slate-200 hover:bg-emerald-50 transition-colors duration-300"
                 >
                   <Icon name="heroicons:chevron-right" class="w-6 h-6 text-slate-600" />
                 </button>
