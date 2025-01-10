@@ -25,7 +25,7 @@
             </div>
             <div class="relative">
               <img
-                src="/images/about-us.png
+                src="/images/about-us.png"
                 alt="About Samarasinghe Trade Center"
                 class="w-full rounded-2xl shadow-2xl relative z-10"
               />
