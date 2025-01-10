@@ -12,10 +12,10 @@
             />
           </div>
           <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8">
-            <h3 class="text-white text-3xl md:text-4xl font-bold mb-2">Premium Collection</h3>
-            <p class="text-white/90 text-lg mb-4">Discover our flagship products with premium quality and design</p>
+            <h3 class="text-white text-3xl md:text-4xl font-bold mb-2">Machinery Collection</h3>
+            <p class="text-white/90 text-lg mb-4">Discover our machinery products with premium quality and design</p>
             <NuxtLink 
-              to="/products/premium"
+              to="/products/category/23"
               class="inline-flex items-center text-white hover:underline mt-2"
             >
               Shop Collection
@@ -36,9 +36,9 @@
             />
           </div>
           <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8">
-            <h3 class="text-white text-2xl md:text-3xl font-bold mb-2">New Arrivals</h3>
+            <h3 class="text-white text-2xl md:text-3xl font-bold mb-2">Garden Products</h3>
             <NuxtLink 
-              to="/products/machines"
+              to="/products/category/15"
               class="inline-flex items-center text-white hover:underline mt-2"
             >
               Shop Collection
@@ -61,7 +61,7 @@
           <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8">
             <h3 class="text-white text-2xl md:text-3xl font-bold mb-2">Household Collection</h3>
             <NuxtLink 
-              to="/products/household"
+              to="/products/category/18"
               class="inline-flex items-center text-white hover:underline mt-2"
             >
               Shop Collection
