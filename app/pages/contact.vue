@@ -231,15 +231,9 @@
               </h2>
               <div class="space-y-2">
                 <div class="flex justify-between">
-                  <span class="text-slate-600">Monday - Friday</span>
+                  <span class="text-slate-600">Monday - Saturday</span>
                   <span class="font-medium text-slate-900"
-                    >9:00 AM - 6:00 PM</span
-                  >
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-slate-600">Saturday</span>
-                  <span class="font-medium text-slate-900"
-                    >9:00 AM - 1:00 PM</span
+                    >7:30 AM - 5:30 PM</span
                   >
                 </div>
                 <div class="flex justify-between">

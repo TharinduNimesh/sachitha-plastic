@@ -59,12 +59,12 @@
                   />
                 </svg>
               </NuxtLink>
-              <NuxtLink
+              <!-- <NuxtLink
                 :to="slides[currentSlide].secondaryButtonLink"
                 class="group inline-flex items-center px-6 py-3 border-2 border-emerald-600 text-emerald-600 font-medium rounded-xl hover:bg-emerald-600 hover:text-white transition-all duration-300"
               >
                 {{ slides[currentSlide].secondaryButtonText }}
-              </NuxtLink>
+              </NuxtLink> -->
             </div>
 
             <!-- Slide Navigation -->
@@ -191,7 +191,7 @@ const slides = [
     subtitle: 'Household Products',
     description: 'Upgrade your home with our eco-friendly, durable, and stylish plastic products.',
     buttonText: 'Explore Products',
-    buttonLink: '/products/household',
+    buttonLink: '/products/category/18',
     secondaryButtonText: 'Learn More',
     secondaryButtonLink: '/about',
     image: '/images/swiper/household-item.jpeg',
@@ -204,7 +204,7 @@ const slides = [
     subtitle: 'Recycling Solutions',
     description: 'Empower sustainability with advanced recycling machines designed for efficiency.',
     buttonText: 'View Machines',
-    buttonLink: '/products/machinery/recycling',
+    buttonLink: '/products/category/23',
     secondaryButtonText: 'See Details',
     secondaryButtonLink: '/details',
     image: '/images/swiper/recycling-machines-hero.jpeg',
@@ -217,7 +217,7 @@ const slides = [
     subtitle: 'Garden Accessories',
     description: 'Enhance your outdoor spaces with our eco-friendly garden pots and accessories.',
     buttonText: 'Shop Now',
-    buttonLink: '/products/garden',
+    buttonLink: '/products/category/15',
     secondaryButtonText: 'Watch Video',
     secondaryButtonLink: '/video',
     image: '/images/swiper/garden-accessories.jpg',

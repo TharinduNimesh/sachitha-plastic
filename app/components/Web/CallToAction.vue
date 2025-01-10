@@ -3,7 +3,7 @@
     <!-- Fixed Background Image -->
     <div 
       class="absolute inset-0 bg-cover bg-center bg-fixed"
-      style="background-image: url('/images/cta-bg.jpg')"
+      style="background-image: url('/images/cta-bg.png')"
     >
       <div class="absolute inset-0 bg-black/50"></div>
     </div>
