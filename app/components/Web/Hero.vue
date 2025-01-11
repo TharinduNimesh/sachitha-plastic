@@ -207,7 +207,7 @@ const slides = [
     buttonLink: '/products/category/23',
     secondaryButtonText: 'See Details',
     secondaryButtonLink: '/details',
-    image: '/images/swiper/recycling-machines-hero.jpeg',
+    image: '/images/swiper/recycling-machines-hero.jpg',
     imageAlt: 'Innovative recycling machine in operation',
     feature: 'High Efficiency'
   },
