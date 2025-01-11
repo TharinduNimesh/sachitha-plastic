@@ -26,7 +26,7 @@
             <p>Phone: +(94) 714 009 247 | +(94) 702 122 923</p>
           </address>
           <NuxtLink
-            href="https://g.co/kgs/4uajTWP"
+            href="https://maps.app.goo.gl/ivRUo4Stw3aJhAAn9"
             target="_blank"
             class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-emerald-600 mt-4"
           >
