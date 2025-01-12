@@ -200,8 +200,8 @@ const slides = [
   },
   {
     tag: 'Recycling Machines',
-    title: 'Innovative',
-    subtitle: 'Recycling Solutions',
+    title: 'Recycling',
+    subtitle: 'Machine & Accessories',
     description: 'Empower sustainability with advanced recycling machines designed for efficiency.',
     buttonText: 'View Machines',
     buttonLink: '/products/category/23',
