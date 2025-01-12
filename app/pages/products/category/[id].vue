@@ -79,7 +79,7 @@ const fetchCategoryData = async () => {
     const { data: categoryData, error: categoryError } = await client
       .from('categories')
       .select('*')
-      .eq('id', route.params.id)
+      .eq('id', Number(route.params.id))
       .single()
 
     if (categoryError) throw categoryError
@@ -93,6 +93,7 @@ const fetchCategoryData = async () => {
         category:categories(name)
       `)
       .eq('status', 'Active')
+      .eq('category_id', Number(route.params.id))
       .order('created_at', { ascending: false })
 
     if (error) throw error
