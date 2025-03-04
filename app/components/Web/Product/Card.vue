@@ -1,99 +1,103 @@
 <template>
-  <div
-    class="group relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer"
-    @click="navigateToProduct"
+  <NuxtLink
+    v-if="!product.isEmpty"
+    :to="`/products/${product.id}`"
+    class="group block bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300"
   >
-    <!-- Product Image Container -->
-    <div class="relative aspect-square overflow-hidden">
+    <!-- Product Image with consistent aspect ratio -->
+    <div class="relative aspect-square overflow-hidden bg-slate-100">
       <img
-        :src="`${$config.public.supabase.url}/storage/v1/object/public/product_images/${product.primary_image}`"
+        v-if="product.primary_image"
+        :src="getImageUrl(product.primary_image)"
         :alt="product.name"
-        class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+        class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+        loading="lazy"
       />
-
-      <!-- Category Badge -->
-      <div class="absolute top-4 left-4" @click.stop>
-        <NuxtLink
-          :to="`/products/category/${product.category_id}`"
-          class="px-3 py-1.5 bg-white/95 backdrop-blur-sm text-emerald-600 rounded-lg text-sm font-medium hover:bg-white hover:text-emerald-700 transition-colors duration-300"
-        >
-          {{ product.category }}
-        </NuxtLink>
+      <div v-else class="w-full h-full flex items-center justify-center text-slate-400">
+        <Icon name="i-uil-image" class="w-12 h-12" />
+      </div>
+      <!-- Category Badge - Enhanced with eco-friendly design -->
+      <div v-if="product.category" class="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-white/90 backdrop-blur-sm border border-emerald-100 rounded-lg shadow-sm">
+        <Icon name="i-uil-apps" class="w-4 h-4 text-emerald-600" />
+        <span class="text-sm font-medium text-emerald-700">{{ product.category }}</span>
+      </div>
+      <!-- Out of Stock Badge -->
+      <div
+        v-if="product.availability === 'OutOfStock'"
+        class="absolute top-3 right-3 px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-full"
+      >
+        Out of Stock
       </div>
     </div>
 
     <!-- Product Info -->
-    <div class="p-6 space-y-3">
-      <!-- Name -->
-      <h3
-        class="text-lg font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors duration-300 line-clamp-1"
-      >
+    <div class="p-4">
+      <h3 class="text-lg font-semibold text-slate-900 line-clamp-1 group-hover:text-emerald-600 transition-colors mb-2">
         {{ product.name }}
       </h3>
 
-      <!-- Description -->
-      <p
-        class="text-sm text-slate-600 line-clamp-2"
-        v-text="cleanDescription"
-      ></p>
-
-      <!-- Bottom Meta -->
-      <div
-        class="pt-3 flex items-center justify-between border-t border-slate-100"
-      >
-        <!-- Status Indicator -->
-        <div class="flex items-center space-x-2">
+      <div 
+        class="prose prose-sm text-slate-600 line-clamp-2"
+        v-html="cleanDescription"
+      />
+      
+      <div class="mt-4 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <Icon 
+            :name="product.availability === 'InStock' ? 'i-uil-box' : 'i-uil-times-circle'"
+            class="w-4 h-4"
+            :class="product.availability === 'InStock' ? 'text-emerald-500' : 'text-red-500'"
+          />
           <span 
-            class="w-2 h-2 rounded-full"
-            :class="{
-              'bg-emerald-500': product.availability === 'InStock',
-              'bg-red-500': product.availability === 'OutOfStock'
-            }"
-          ></span>
-          <span class="text-sm text-slate-600">
+            class="text-sm font-medium"
+            :class="product.availability === 'InStock' ? 'text-emerald-700' : 'text-red-700'"
+          >
             {{ product.availability === 'InStock' ? 'In Stock' : 'Out of Stock' }}
           </span>
         </div>
-
-        <!-- Learn More Link -->
-        <div @click.stop>
-          <NuxtLink
-            :to="`/products/${product.id}`"
-            class="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors duration-300"
-          >
-            Learn More
-          </NuxtLink>
+        <div class="flex items-center gap-1 text-emerald-600">
+          <span class="text-sm font-medium">View Details</span>
+          <Icon 
+            name="i-uil-angle-right" 
+            class="w-5 h-5 group-hover:translate-x-1 transition-transform" 
+          />
         </div>
       </div>
     </div>
-  </div>
+  </NuxtLink>
+  <!-- Empty slot placeholder with same dimensions -->
+  <div
+    v-else
+    class="opacity-0 bg-transparent rounded-2xl border border-transparent"
+    aria-hidden="true"
+  ></div>
 </template>
 
 <script setup lang="ts">
-const router = useRouter();
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  primary_image: string;
-  category_id: number;
-  category: string;
-  availability: 'InStock' | 'OutOfStock';  // Added this line
+import type { Product } from '~/types/product.types'
+import type { Database } from '~/types/database.types'
+
+interface ExtendedProduct extends Product {
+  isEmpty?: boolean;
+  category: string; // Add category as string since it comes from the join
 }
 
 const props = defineProps<{
-  product: Product
-}>();
+  product: ExtendedProduct
+}>()
 
-const navigateToProduct = () => {
-  router.push(`/products/${props.product.id}`);
-};
+const config = useRuntimeConfig()
+
+const getImageUrl = (path: string | null): string | undefined => {
+  if (!path) return undefined
+  return `${config.public.supabase.url}/storage/v1/object/public/product_images/${path}`
+}
 
 const cleanDescription = computed(() => {
   if (!props.product?.description) return '';
 
-  // Strip HTML tags using regex
-  const strippedText = props.product.description
+  // Strip HTML tags and entities
+  return props.product.description
     .replace(/<[^>]*>/g, '') // Remove HTML tags
     .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
     .replace(/&amp;/g, '&') // Replace &amp; with &
@@ -101,8 +105,5 @@ const cleanDescription = computed(() => {
     .replace(/&gt;/g, '>') // Replace &gt; with >
     .replace(/\s+/g, ' ') // Replace multiple spaces with single space
     .trim(); // Remove leading/trailing spaces
-    
-  // Limit to 150 characters and add ellipsis if needed
-  return strippedText.length > 150 ? `${strippedText.substring(0, 150)}...` : strippedText;
-});
+})
 </script>

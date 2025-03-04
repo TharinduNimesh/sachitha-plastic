@@ -1,109 +1,5 @@
 <template>
-  <div class="container mx-auto space-y-8 px-4 sm:px-6 lg:px-8 pt-20">
-    <!-- Search and Filters -->
-    <!-- <div class="bg-white rounded-xl shadow-sm  py-6">
-      <div class="flex flex-col gap-6">
-        <div class="relative max-w-2xl">
-          <div class="relative">
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Search products..."
-              class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300"
-            />
-            <Icon
-              name="heroicons:magnifying-glass"
-              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
-            />
-          </div>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-4">
-          <div class="flex flex-wrap items-center gap-2">
-            <span v-if="!hasActiveFilters" class="text-sm text-slate-500">No active filters</span>
-            <div v-else class="flex items-center gap-2">
-              <button
-                @click="resetFilters"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg text-sm hover:bg-emerald-100 transition-colors duration-300"
-              >
-                <span>{{ selectedCategory }}</span>
-                <Icon name="heroicons:x-mark" class="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-3 ml-auto">
-            <div class="relative" ref="filterMenuRef">
-              <button
-                @click="isFilterMenuOpen = !isFilterMenuOpen"
-                class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors duration-300"
-              >
-                <Icon name="heroicons:funnel" class="w-5 h-5 text-slate-500" />
-                <span class="text-sm font-medium text-slate-700">Filters</span>
-              </button>
-
-              <div
-                v-show="isFilterMenuOpen"
-                class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-slate-200 z-50"
-              >
-                <div class="p-4">
-                  <h3 class="font-medium text-slate-900 mb-3">Category</h3>
-                  <select
-                    v-model="selectedCategory"
-                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-                  >
-                    <option value="">All Categories</option>
-                    <option
-                      v-for="category in uniqueCategories"
-                      :key="category"
-                      :value="category"
-                    >
-                      {{ category }}
-                    </option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-1 p-1 bg-slate-100 rounded-lg">
-              <button
-                @click="viewMode = 'grid'"
-                :class="[
-                  'p-2 rounded-lg transition-colors duration-300',
-                  viewMode === 'grid'
-                    ? 'bg-white shadow text-emerald-600'
-                    : 'text-slate-600 hover:text-slate-900',
-                ]"
-              >
-                <Icon name="heroicons:squares-2x2" class="w-5 h-5" />
-              </button>
-              <button
-                @click="viewMode = 'list'"
-                :class="[
-                  'p-2 rounded-lg transition-colors duration-300',
-                  viewMode === 'list'
-                    ? 'bg-white shadow text-emerald-600'
-                    : 'text-slate-600 hover:text-slate-900',
-                ]"
-              >
-                <Icon name="heroicons:bars-3" class="w-5 h-5" />
-              </button>
-            </div>
-
-            <select
-              v-model="sortBy"
-              class="px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="name_asc">Name (A-Z)</option>
-              <option value="name_desc">Name (Z-A)</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div> -->
-
+  <div class="container mx-auto space-y-8 px-4 sm:px-6 lg:px-8 py-20">
     <!-- Section Header -->
     <div
       class="flex flex-col md:flex-row md:items-center justify-between mb-12"
@@ -185,16 +81,6 @@
           Reset Filters
         </button>
       </div>
-
-      <!-- Load More -->
-      <div v-else-if="hasMoreItems" class="flex justify-center mt-12">
-        <button
-          @click="loadMore"
-          class="px-6 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-colors duration-300"
-        >
-          Load More
-        </button>
-      </div>
     </template>
   </div>
 </template>
@@ -202,17 +88,42 @@
 <script setup lang="ts">
 import type { Database } from "~/types/database.types";
 import type { Product } from "~/types/product.types";
+import { debounce } from "lodash-es";
+
+interface ExtendedProduct extends Omit<Product, 'category'> {
+  category: string;
+}
 
 // State
 const loading = ref(false);
-const products = ref<Product[]>([]);
+const products = ref<ExtendedProduct[]>([]);
 const searchQuery = ref("");
 const selectedCategory = ref("");
 const viewMode = ref<"grid" | "list">("grid");
 const sortBy = ref<"newest" | "oldest" | "name_asc" | "name_desc">("newest");
-const displayedItems = ref(12);
 const isFilterMenuOpen = ref(false);
-const filterMenuRef = ref();
+const filterMenuRef = ref<HTMLElement | null>(null);
+
+// Initial items to display (default for mobile)
+const itemsToDisplay = ref(3);
+
+// Calculate number of items to display based on viewport
+const getItemsToDisplay = () => {
+  // Check if we're in browser environment
+  if (process.client) {
+    const width = window.innerWidth;
+    if (width >= 1280) return 8; // xl:grid-cols-4 -> 2 rows × 4 columns
+    if (width >= 1024) return 6; // lg:grid-cols-3 -> 2 rows × 3 columns
+    if (width >= 640) return 4;  // sm:grid-cols-2 -> 2 rows × 2 columns
+    return 3; // 1 column -> 3 rows × 1 column
+  }
+  return 3; // Default for SSR
+}
+
+// Update items to display on resize
+const updateItemsToDisplay = debounce(() => {
+  itemsToDisplay.value = getItemsToDisplay();
+}, 250);
 
 // Supabase Client
 const client = useSupabaseClient<Database>();
@@ -228,7 +139,7 @@ const fetchProducts = async () => {
         category:categories(name)
       `)
       .eq('status', 'Active')
-      .limit(8)
+      .limit(itemsToDisplay.value)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -290,35 +201,10 @@ const filteredProducts = computed(() => {
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
           );
       }
-    })
-    .slice(0, displayedItems.value);
-});
-
-const hasMoreItems = computed(() => {
-  const filtered = products.value?.filter((product) => {
-    const searchTerm = searchQuery.value.toLowerCase();
-    if (
-      searchTerm &&
-      !product.name.toLowerCase().includes(searchTerm) &&
-      !product.description.toLowerCase().includes(searchTerm)
-    ) {
-      return false;
-    }
-
-    if (selectedCategory.value && product.category !== selectedCategory.value) {
-      return false;
-    }
-
-    return true;
-  });
-  return filtered.length > displayedItems.value;
+    });
 });
 
 // Methods
-const loadMore = () => {
-  displayedItems.value += 12;
-};
-
 const resetFilters = () => {
   searchQuery.value = "";
   selectedCategory.value = "";
@@ -336,11 +222,28 @@ const handleClickOutside = (event: MouseEvent) => {
 
 // Lifecycle
 onMounted(() => {
+  // Set initial items to display based on client viewport
+  itemsToDisplay.value = getItemsToDisplay();
+  // Then fetch products
   fetchProducts();
+  // Add resize listener
+  if (process.client) {
+    window.addEventListener('resize', updateItemsToDisplay);
+  }
   document.addEventListener("click", handleClickOutside);
 });
 
 onUnmounted(() => {
+  if (process.client) {
+    window.removeEventListener('resize', updateItemsToDisplay);
+  }
   document.removeEventListener("click", handleClickOutside);
+});
+
+// Watch for viewport changes and refetch products if needed
+watch(itemsToDisplay, (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    fetchProducts();
+  }
 });
 </script>

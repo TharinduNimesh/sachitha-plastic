@@ -59,7 +59,7 @@
         <!-- Trust Indicators -->
         <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8">
           <div class="text-center">
-            <div class="text-3xl font-bold text-white mb-1">41+</div>
+            <div class="text-3xl font-bold text-white mb-1">{{ new Date().getFullYear() - 1984 }}</div>
             <div class="text-sm text-white/80">Years Experience</div>
           </div>
           <div class="text-center">
