@@ -23,7 +23,7 @@
           </h1>
           <p class="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Pioneering sustainable plastic solutions and innovative recycling
-            technologies for over 41 years.
+            technologies for over {{ new Date().getFullYear() - 1984 }} years.
           </p>
         </div>
       </div>
@@ -205,7 +205,7 @@
             >
               <div class="absolute bottom-0 left-0 right-0 p-6">
                 <p class="text-white text-lg font-medium tracking-wide">
-                  41+ Years of Excellence in Sustainable Solutions
+                  {{ new Date().getFullYear() - 1984 }} Years of Excellence in Sustainable Solutions
                 </p>
               </div>
             </div>
@@ -397,7 +397,7 @@ useHead({
     {
       name: "description",
       content:
-        "Learn about Samarasinghe Trade Center's 41+ years of excellence in plastic manufacturing and recycling solutions. ISO certified company committed to quality and sustainability.",
+        "Learn about Samarasinghe Trade Center's {{ new Date().getFullYear() - 1984 }} years of excellence in plastic manufacturing and recycling solutions. ISO certified company committed to quality and sustainability.",
     },
     {
       name: "keywords",

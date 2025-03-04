@@ -236,7 +236,6 @@ nav::-webkit-scrollbar {
 
 <script setup>
 import { ref, computed } from "vue";
-import { debounce } from "lodash-es";
 
 const sidebarStore = useSidebarStore();
 const authStore = useAuthStore(); // Add auth store

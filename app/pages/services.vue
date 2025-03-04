@@ -125,7 +125,7 @@
               <Icon name="mdi:certificate" class="w-6 h-6 text-emerald-600" />
             </div>
             <h3 class="text-xl font-bold text-slate-900 mb-4">
-              25+ Years Experience
+              {{ new Date().getFullYear() - 1984 }} Years Experience
             </h3>
             <p class="text-slate-600 leading-relaxed">
               Decades of expertise in plastic recycling and sustainable

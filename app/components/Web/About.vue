@@ -55,7 +55,7 @@
                     <p class="text-sm font-medium text-slate-600">
                       Years of Experience
                     </p>
-                    <p class="text-lg font-bold text-slate-900">41+ Years</p>
+                    <p class="text-lg font-bold text-slate-900">{{ new Date().getFullYear() - 1984 }} Years</p>
                   </div>
                 </div>
               </div>
@@ -82,7 +82,7 @@
           <p class="text-lg text-slate-600">
             At Samarasinghe Trade Center, we're committed to revolutionizing the
             plastic industry through sustainable practices and innovative
-            solutions. With over 41 years of experience, we've established
+            solutions. With over {{ new Date().getFullYear() - 1984 }} years of experience, we've established
             ourselves as a pioneer in eco-friendly plastic products and
             recycling machinery.
           </p>
