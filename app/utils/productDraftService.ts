@@ -1,37 +1,67 @@
-export interface ProductDraft {
-  name: string
-  description: string
-  category: string
-  status: string
-  images: Array<{ url: string; id: string }>
-  lastSaved: string | null
-}
+import type { ProductDraft } from '@/types/product.types'
 
 const STORAGE_KEY = 'product-draft'
 
-// Debounce function to limit save operations
-const debounce = <T extends (...args: any[]) => void>(fn: T, delay: number) => {
-  let timeoutId: ReturnType<typeof setTimeout>
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeoutId)
-    timeoutId = setTimeout(() => fn(...args), delay)
-  }
+type DraftPayload = Omit<ProductDraft, 'lastSaved'>
+
+type DebouncedSaveFn = ((draft: DraftPayload) => void) & {
+  cancel: () => void
 }
 
+const saveDraftToStorage = (draft: DraftPayload): boolean => {
+  const draftWithTimestamp: ProductDraft = {
+    ...draft,
+    lastSaved: new Date().toISOString(),
+  }
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(draftWithTimestamp))
+  return true
+}
+
+const debounce = (fn: (draft: DraftPayload) => void, delay: number): DebouncedSaveFn => {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined
+
+  const debounced = ((draft: DraftPayload) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+    }
+
+    timeoutId = setTimeout(() => fn(draft), delay)
+  }) as DebouncedSaveFn
+
+  debounced.cancel = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+      timeoutId = undefined
+    }
+  }
+
+  return debounced
+}
+
+const debouncedSaveDraft = debounce((draft: DraftPayload) => {
+  try {
+    saveDraftToStorage(draft)
+  } catch (error) {
+    console.error('Error saving draft:', error)
+  }
+}, 500)
+
 export const productDraftService = {
-  saveDraft: debounce((draft: Omit<ProductDraft, 'lastSaved'>) => {
+  saveDraft: debouncedSaveDraft,
+
+  saveDraftNow(draft: DraftPayload): boolean {
     try {
-      const draftWithTimestamp = {
-        ...draft,
-        lastSaved: new Date().toISOString()
-      }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(draftWithTimestamp))
-      return true
+      return saveDraftToStorage(draft)
     } catch (error) {
       console.error('Error saving draft:', error)
       return false
     }
-  }, 500), // Debounce for 500ms
+  },
+
+  cancelPendingSave() {
+    debouncedSaveDraft.cancel()
+  },
 
   getDraft(): ProductDraft | null {
     try {
@@ -47,7 +77,7 @@ export const productDraftService = {
     return localStorage.getItem(STORAGE_KEY) !== null
   },
 
-  clearDraft() {
+  clearDraft(): boolean {
     try {
       localStorage.removeItem(STORAGE_KEY)
       return true
@@ -55,5 +85,5 @@ export const productDraftService = {
       console.error('Error clearing draft:', error)
       return false
     }
-  }
+  },
 }

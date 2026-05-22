@@ -7,10 +7,14 @@
       <!-- Product Image -->
       <div class="relative w-48 h-48">
         <img
-          :src="`${$config.public.supabase.url}/storage/v1/object/public/product_images/${product.primary_image}`"
+          v-if="product.primary_image"
+          :src="product.primary_image.startsWith('/') ? product.primary_image : `${$config.public.supabase.url}/storage/v1/object/public/product_images/${product.primary_image}`"
           :alt="product.name"
           class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
         />
+        <div v-else class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-300">
+          <Icon name="i-uil-image" class="w-12 h-12" />
+        </div>
         <!-- Category Badge -->
         <div class="absolute top-4 left-4" @click.stop>
           <NuxtLink

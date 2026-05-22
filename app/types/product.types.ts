@@ -2,6 +2,7 @@ import type { Database } from './database.types'
 
 export interface ProductImage {
   url: string
+  id?: string
   file?: File
   isPrimary?: boolean;
 }

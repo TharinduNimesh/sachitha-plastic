@@ -10,7 +10,7 @@
       <div class="space-y-2">
         <label class="block text-sm font-medium text-slate-700">
           Category Image
-          <span class="text-red-500">*</span>
+          <span class="text-sm text-slate-400 ml-2">(optional)</span>
         </label>
         <div 
           :class="[
@@ -103,6 +103,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
   'created': [category: any]
+  'category-created': [category: any]
 }>()
 
 const formData = ref<FormData>({
@@ -130,7 +131,7 @@ const generateUniqueFileName = (file: File): string => {
 
 // Computed property to check if form is valid
 const isValid = computed(() => {
-  return formData.value.name.trim() !== '' && formData.value.image !== null && Object.keys(errors.value).length === 0
+  return formData.value.name.trim() !== '' && Object.keys(errors.value).length === 0
 })
 
 // Validate form data
@@ -143,9 +144,7 @@ const validateForm = (): boolean => {
     errors.value.name = 'Category name must be at least 3 characters'
   }
 
-  if (!formData.value.image) {
-    errors.value.image = 'Category image is required'
-  }
+  // image is optional
 
   return Object.keys(errors.value).length === 0
 }
@@ -168,7 +167,7 @@ const handleImageChange = (event: Event) => {
 const removeImage = () => {
   formData.value.image = null
   imagePreview.value = null
-  errors.value.image = 'Category image is required'
+  delete errors.value.image
 }
 
 const handleSubmit = async () => {
@@ -180,26 +179,29 @@ const handleSubmit = async () => {
   try {
     isSubmitting.value = true
 
-    if (!formData.value.image) {
-      throw new Error('Image is required')
+    let publicUrl: string | null = null
+    let uniqueFileName: string | null = null
+
+    if (formData.value.image) {
+      // 1. Generate unique filename
+      uniqueFileName = generateUniqueFileName(formData.value.image)
+
+      // 2. Upload image to Supabase storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('category_images')
+        .upload(uniqueFileName, formData.value.image)
+
+      if (uploadError) {
+        throw new Error('Failed to upload image: ' + uploadError.message)
+      }
+
+      // 3. Get public URL for the uploaded image
+      const { data: { publicUrl: url } } = supabase.storage
+        .from('category_images')
+        .getPublicUrl(uniqueFileName)
+
+      publicUrl = url
     }
-
-    // 1. Generate unique filename
-    const uniqueFileName = generateUniqueFileName(formData.value.image)
-
-    // 2. Upload image to Supabase storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('category_images')
-      .upload(uniqueFileName, formData.value.image)
-
-    if (uploadError) {
-      throw new Error('Failed to upload image: ' + uploadError.message)
-    }
-
-    // 3. Get public URL for the uploaded image
-    const { data: { publicUrl } } = supabase.storage
-      .from('category_images')
-      .getPublicUrl(uniqueFileName)
 
     // 4. Create category in the database
     const { data: categoryData, error: categoryError } = await supabase
@@ -207,27 +209,32 @@ const handleSubmit = async () => {
       .insert([
         {
           name: formData.value.name,
-          image: publicUrl,
+          image: publicUrl ?? '',
         }
       ])
       .select()
       .single()
 
     if (categoryError) {
-      // If category creation fails, delete the uploaded image
-      await supabase.storage
-        .from('category_images')
-        .remove([uniqueFileName])
-      
+      // If category creation fails, delete the uploaded image (if uploaded)
+      if (uniqueFileName) {
+        await supabase.storage
+          .from('category_images')
+          .remove([uniqueFileName])
+      }
+
       throw new Error('Failed to create category: ' + categoryError.message)
     }
 
     // Show success message
     success('Category created successfully')
-    
+
+    // Notify parent so it can refresh
+    emit('category-created', categoryData)
+
     // Close modal
     emit('update:modelValue', false)
-    
+
     // Reset form
     formData.value = {
       name: '',

@@ -274,6 +274,7 @@ const isEditing = ref(false);
 const isSubmitting = ref(false);
 const showLeaveConfirmation = ref(false);
 const navigationTarget = ref<string | null>(null);
+const allowNavigation = ref(false);
 const categories = ref<Category[]>([]);
 
 // Enable edit mode based on query parameter
@@ -286,7 +287,7 @@ watchEffect(() => {
 
 // Clear editable query parameter when exiting edit mode
 watch(isEditing, (newValue) => {
-  if (!newValue) {
+  if (!newValue && !allowNavigation.value) {
     // Remove editable query parameter without triggering navigation
     router.replace({ 
       query: { 
@@ -386,14 +387,17 @@ const statusClasses = computed(() => ({
 const handleStayOnPage = () => {
   showLeaveConfirmation.value = false;
   navigationTarget.value = null;
+  allowNavigation.value = false;
 };
 
-const handleLeavePage = () => {
+const handleLeavePage = async () => {
+  allowNavigation.value = true;
   isEditing.value = false;
   if (navigationTarget.value) {
-    router.push(navigationTarget.value);
+    await router.push(navigationTarget.value);
   }
   showLeaveConfirmation.value = false;
+  navigationTarget.value = null;
 };
 
 const handleBackNavigation = () => {
@@ -477,14 +481,9 @@ const handleSubmit = async () => {
         if (pathParts.length > 1) primaryImagePath = pathParts[1];
       }
     } else {
-      // Default to first image if no primary is set
+      // Leave primary image empty when no image exists
       const firstPath = uploadedImages[0]?.path || currentImages[0]?.url.split('product_images/')[1];
       if (firstPath) primaryImagePath = firstPath;
-    }
-
-    if (!primaryImagePath) {
-      toast.error("No valid primary image");
-      return;
     }
 
     // 4. Update product record
@@ -496,7 +495,7 @@ const handleSubmit = async () => {
         category_id: Number(product.category),
         availability: product.availability,
         status: product.status,
-        primary_image: primaryImagePath,
+        primary_image: primaryImagePath || null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', product.id);
@@ -562,6 +561,11 @@ onMounted(async () => {
 
 // Navigation guard
 onBeforeRouteLeave((to, from, next) => {
+  if (allowNavigation.value) {
+    next();
+    return;
+  }
+
   if (isEditing.value) {
     showLeaveConfirmation.value = true;
     navigationTarget.value = to.fullPath;

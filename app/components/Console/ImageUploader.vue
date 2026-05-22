@@ -19,14 +19,17 @@
       />
 
       <div class="text-center" v-if="!images.length">
-        <Icon name="i-uil-image-upload" class="w-12 h-12 mx-auto text-slate-400" />
-        <h3 class="mt-2 text-sm font-medium text-slate-900">Drop images here</h3>
+        <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-sm ring-1 ring-emerald-100">
+          <Icon name="i-uil-image-upload" class="h-10 w-10" />
+        </div>
+        <h3 class="mt-4 text-sm font-semibold text-slate-900">Drop images here</h3>
         <p class="mt-1 text-xs text-slate-500">Or click to select files</p>
         <button
           type="button"
           @click="$refs.fileInput.click()"
-          class="mt-4 btn-secondary text-sm"
+          class="mt-4 inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700"
         >
+          <Icon name="i-uil-plus" class="h-4 w-4" />
           Select Files
         </button>
       </div>
@@ -35,7 +38,7 @@
       <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
         <div
           v-for="(image, index) in images"
-          :key="image.id"
+          :key="image.id || image.url || index"
           class="relative group aspect-square"
         >
           <img
@@ -109,7 +112,7 @@ import { ref, computed } from 'vue';
 
 interface Image {
   url: string;
-  id: string;
+  id?: string;
   isPrimary?: boolean;
 }
 
