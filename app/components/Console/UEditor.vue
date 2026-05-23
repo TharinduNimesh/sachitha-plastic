@@ -189,6 +189,9 @@ const props = defineProps({
 });
 
 const editor = useEditor({
+  onUpdate: ({ editor }) => {
+    emit("update:modelValue", editor.getHTML());
+  },
   editorProps: {
     attributes: {
       class:
@@ -202,7 +205,6 @@ const editor = useEditor({
     TextStyle,
     Color,
     Highlight,
-    TextStyle,
     ListItem,
     TextAlign.configure({
       types: ["heading", "paragraph"],
@@ -228,9 +230,14 @@ const editor = useEditor({
 });
 
 watch(
-  () => editor.value?.getHTML(),
+  () => props.modelValue,
   (value) => {
-    emit("update:modelValue", value);
+    if (!editor.value) return;
+
+    const nextValue = value || '';
+    if (nextValue !== editor.value.getHTML()) {
+      editor.value.commands.setContent(nextValue, false);
+    }
   }
 );
 

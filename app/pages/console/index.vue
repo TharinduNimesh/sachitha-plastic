@@ -1,8 +1,8 @@
 <template>
   <NuxtLayout name="console">
-    <div class="p-6">
+    <div class="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <!-- Page Title -->
-      <div class="mb-8">
+      <div>
         <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
         <p class="mt-1 text-slate-600">
           Overview of your website activity and performance
@@ -10,7 +10,7 @@
       </div>
 
       <!-- Top Stats Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <!-- Total Products -->
         <ConsoleWidgetsStatsCard
           title="Total Products"
@@ -143,11 +143,11 @@
         </div>
 
         <!-- Right Sidebar -->
-        <div class="space-y-6">
+        <div class="space-y-6 lg:sticky lg:top-6 lg:self-start">
           <!-- Recent Updates -->
           <div class="bg-white rounded-xl shadow-sm p-6">
             <h3 class="text-lg font-semibold text-slate-900 mb-6">Recent Updates</h3>
-            <div class="space-y-6">
+            <div class="max-h-72 space-y-6 overflow-y-auto pr-1">
               <template v-if="recentUpdates?.length">
                 <div
                   v-for="update in recentUpdates"
@@ -201,7 +201,7 @@
                 Mark all as read
               </button>
             </div>
-            <div class="space-y-4">
+            <div class="max-h-[28rem] space-y-4 overflow-y-auto pr-1">
               <template v-if="notifications?.length">
                 <div
                   v-for="notification in notifications"

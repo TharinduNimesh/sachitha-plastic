@@ -158,7 +158,9 @@ const config = useRuntimeConfig();
 
 // Methods
 const getImageUrl = (path: string) => {
-  return `${config.public.supabase.url}/storage/v1/object/public/product_images/${path}`;
+  return path.startsWith('/')
+    ? path
+    : `${config.public.supabase.url}/storage/v1/object/public/product_images/${path}`;
 };
 
 const allImages = ref<string[]>([]);

@@ -67,9 +67,7 @@ type Inquiry = Database['public']['Tables']['inquiries']['Row']
 type InquiryStatus = Database['public']['Enums']['InquiryStatus']
 type InquiryWithStatus = Inquiry & { status?: InquiryStatus }
 
-interface Props extends InquiryWithStatus {}
-
-const props = defineProps<Props>()
+const props = defineProps<InquiryWithStatus>()
 defineEmits(['resolve', 'delete'])
 
 const formattedDate = computed(() => {

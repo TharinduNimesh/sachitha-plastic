@@ -184,53 +184,28 @@
             :views="product.statistics?.views || 0"
             @edit="handleEdit(product)"
             @preview="handlePreview(product)"
-            @archive="handleDelete(product)"
+            @delete="handleDelete(product)"
             @toggle-status="toggleStatus(product)"
           />
         </div>
 
         <!-- Pagination Controls -->
-        <div v-if="totalPages > 1" class="mt-8 flex items-center justify-center gap-2">
-          <button
-            @click="prevPage"
-            :disabled="currentPage === 1"
-            class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Icon name="i-uil-angle-left" class="w-5 h-5" />
-          </button>
-
-          <button
-            v-for="page in totalPages"
-            :key="page"
-            @click="handlePageChange(page)"
-            :class="[
-              'inline-flex items-center justify-center w-10 h-10 rounded-lg border text-sm font-medium',
-              currentPage === page
-                ? 'border-emerald-500 bg-emerald-50 text-emerald-600'
-                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-            ]"
-          >
-            {{ page }}
-          </button>
-
-          <button
-            @click="nextPage"
-            :disabled="currentPage === totalPages"
-            class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Icon name="i-uil-angle-right" class="w-5 h-5" />
-          </button>
+        <div v-if="totalPages > 1" class="mt-8 overflow-x-auto pb-1">
+          <CommonPagination
+            v-model:currentPage="currentPage"
+            :total-pages="totalPages"
+          />
         </div>
       </div>
     </div>
     
-    <!-- Add Confirmation Modal -->
+    <!-- Delete Confirmation Modal -->
     <CommonConfirmModal
       v-model="showConfirmModal"
-      title="Archive Product"
+      :title="confirmTitle"
       :message="confirmMessage"
-      confirm-label="Archive"
-      @confirm="confirmArchive"
+      :confirm-label="confirmLabel"
+      @confirm="confirmAction"
     />
   </NuxtLayout>
 </template>
@@ -255,7 +230,7 @@ const sortBy = ref('newest')
 const isFilterMenuOpen = ref(false)
 const isSortMenuOpen = ref(false)
 const showConfirmModal = ref(false)
-const productToArchive = ref<Product | null>(null)
+const productToDelete = ref<Product | null>(null)
 const categories = ref<Database['public']['Tables']['categories']['Row'][]>([])
 
 // Refs for click outside handling
@@ -270,9 +245,13 @@ const hasActiveFilters = computed(() => {
   return selectedCategory.value || selectedStatus.value || searchQuery.value
 })
 
+const confirmTitle = computed(() => 'Delete Product')
+
 const confirmMessage = computed(() => {
-  return `Are you sure you want to archive ${productToArchive.value?.name}? This will hide the product from the website.`
+  return `Are you sure you want to permanently delete ${productToDelete.value?.name}? This cannot be undone.`
 })
+
+const confirmLabel = computed(() => 'Delete')
 
 const filteredProducts = computed(() => {
   let result = [...products.value]
@@ -382,38 +361,65 @@ const handlePreview = (product: Product) => {
 }
 
 const handleDelete = (product: Product) => {
-  productToArchive.value = product
+  productToDelete.value = product
   showConfirmModal.value = true
 }
 
-const confirmArchive = async () => {
-  if (!productToArchive.value) return
+const confirmAction = async () => {
+  if (!productToDelete.value) return
 
   try {
     loading.value = true
     const client = useSupabaseClient<Database>()
+
+    const { data: imageRows, error: imagesFetchError } = await client
+      .from('product_images')
+      .select('path')
+      .eq('product_id', productToDelete.value.id)
+
+    if (imagesFetchError) throw imagesFetchError
+
+    const imagePaths = (imageRows || []).map(image => image.path)
+
+    if (imagePaths.length) {
+      const { error: storageError } = await client.storage
+        .from('product_images')
+        .remove(imagePaths)
+
+      if (storageError) throw storageError
+    }
+
+    const { error: statisticsError } = await client
+      .from('product_statistics')
+      .delete()
+      .eq('product_id', productToDelete.value.id)
+
+    if (statisticsError) throw statisticsError
+
+    const { error: imageDeleteError } = await client
+      .from('product_images')
+      .delete()
+      .eq('product_id', productToDelete.value.id)
+
+    if (imageDeleteError) throw imageDeleteError
     
     const { error: updateError } = await client
       .from('products')
-      .update({ status: 'Hidden' })
-      .eq('id', productToArchive.value.id)
+      .delete()
+      .eq('id', productToDelete.value.id)
 
     if (updateError) throw updateError
 
-    // Update local state
-    const index = products.value.findIndex(p => p.id === productToArchive.value?.id)
-    if (index !== -1) {
-      products.value[index].status = 'Hidden'
-    }
+    products.value = products.value.filter(p => p.id !== productToDelete.value?.id)
 
-    success('Product archived successfully')
+    success('Product deleted successfully')
   } catch (e) {
-    console.error('Error archiving product:', e)
-    toastError('Failed to archive product. Please try again.')
+    console.error('Error deleting product:', e)
+    toastError('Failed to delete product. Please try again.')
   } finally {
     loading.value = false
     showConfirmModal.value = false
-    productToArchive.value = null
+    productToDelete.value = null
   }
 }
 

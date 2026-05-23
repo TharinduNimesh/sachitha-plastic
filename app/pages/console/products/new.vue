@@ -82,7 +82,7 @@
 
       <!-- Main Form Card -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-        <form @submit.prevent="handleSubmit" class="p-6 space-y-8">
+        <form :key="draftRenderKey" @submit.prevent="handleSubmit" class="p-6 space-y-8">
           <!-- Basic Information -->
           <div>
             <h3 class="text-lg font-medium text-gray-900 mb-4">
@@ -115,6 +115,7 @@
               Product Description
             </h3>
             <ConsoleUEditor
+              :key="draftRenderKey"
               v-model="product.description"
               placeholder="Enter product description"
             />
@@ -126,6 +127,7 @@
               Product Images
             </h3>
             <ConsoleImageUploader
+              :key="draftRenderKey"
               v-model="product.images"
               :max-images="4"
               accept="image/*"
@@ -154,7 +156,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from "vue";
+import { ref, computed, onMounted, reactive, nextTick } from "vue";
 import type { RouteLocationNormalized } from "vue-router";
 import { useRouter, onBeforeRouteLeave } from "vue-router";
 import { productDraftService } from "@/utils/productDraftService";
@@ -170,6 +172,8 @@ const navigationTarget = ref<string | null>(null);
 const isNavigating = ref(false);
 const isFormSubmitted = ref(false);
 const isSubmitting = ref(false);
+const formattedLastSaved = ref('Unknown');
+const draftRenderKey = ref(0);
 
 // Add meta information for SEO
 useHead({
@@ -205,31 +209,47 @@ onMounted(async () => {
   await fetchCategories();
   const hasDraft = productDraftService.hasDraft();
   if (hasDraft) {
+    const draft = productDraftService.getDraft();
+    formattedLastSaved.value = draft?.lastSaved
+      ? new Date(draft.lastSaved).toLocaleString()
+      : 'Unknown';
     showDraftDialog.value = true;
   }
 });
 
 // Load draft content
-const loadDraft = (): void => {
+const loadDraft = async (): Promise<void> => {
   const draft = productDraftService.getDraft();
   if (draft) {
+    const restoredImages = (draft.images ?? []).map((image, index) => ({
+      url: image.url,
+      id: image.id ?? crypto.randomUUID(),
+      isPrimary: image.isPrimary ?? index === 0,
+    }));
+
     Object.assign(product, {
       name: draft.name,
       description: draft.description,
       category: draft.category,
-      images: draft.images,
+      images: restoredImages,
     });
+    draftRenderKey.value += 1;
+    await nextTick();
   }
   showDraftDialog.value = false;
 };
 
 // Start fresh without clearing draft
 const startFresh = (): void => {
+  productDraftService.cancelPendingSave();
   showDraftDialog.value = false;
+  formattedLastSaved.value = 'Unknown';
+  draftRenderKey.value += 1;
 };
 
 // Clear draft and reset form
 const clearDraft = (): void => {
+  productDraftService.cancelPendingSave();
   productDraftService.clearDraft();
   Object.assign(product, {
     name: "",
@@ -249,6 +269,7 @@ const handleStayOnPage = (): void => {
 const handleLeavePage = (): void => {
   if (navigationTarget.value) {
     isNavigating.value = true;
+    productDraftService.saveDraftNow({ ...product });
     router.push(navigationTarget.value);
   }
   showLeaveConfirmation.value = false;
@@ -281,36 +302,33 @@ const handleSubmit = async (): Promise<void> => {
       return;
     }
 
-    if (!product.images.length) {
-      toast.error("Please upload at least one image");
-      return;
-    }
-
     isSubmitting.value = true;
     isFormSubmitted.value = true;
 
-    // 1. Upload images to Supabase Storage
-    const uploadedImages = await Promise.all(
-      product.images.map(async (image) => {
-        const fileName = `${crypto.randomUUID()}.${
-          image.url.split(";")[0]?.split("/")[1]
-        }`;
-        const { data, error } = await client.storage
-          .from("product_images")
-          .upload(`${fileName}`, base64ToBlob(image.url), {
-            contentType: image.url.split(";")[0]?.split(":")[1],
-          });
+    // 1. Upload images to Supabase Storage when provided
+    const uploadedImages = product.images.length
+      ? await Promise.all(
+          product.images.map(async (image) => {
+            const fileName = `${crypto.randomUUID()}.${
+              image.url.split(";")[0]?.split("/")[1]
+            }`;
+            const { data, error } = await client.storage
+              .from("product_images")
+              .upload(`${fileName}`, base64ToBlob(image.url), {
+                contentType: image.url.split(";")[0]?.split(":")[1],
+              });
 
-        if (error) throw error;
-        return data.path;
-      })
-    );
+            if (error) throw error;
+            return data.path;
+          })
+        )
+      : [];
 
     // 2. Create product record
     const primaryImage = product.images.find(img => img.isPrimary)?.url || product.images[0]?.url || '';
     const primaryImagePath = uploadedImages.find(path => 
       path.includes(primaryImage.split(";")[0]?.split("/")[1] ?? '')
-    ) || uploadedImages[0];
+    ) || uploadedImages[0] || null;
 
     const { data: productData, error: productError } = await client
       .from("products")
@@ -328,12 +346,14 @@ const handleSubmit = async (): Promise<void> => {
     if (productError) throw productError;
 
     // 3. Create product images records
-    const { error: imagesError } = await client.from("product_images").insert(
-      uploadedImages.map((path) => ({
-        product_id: productData.id,
-        path,
-      }))
-    );
+    const { error: imagesError } = uploadedImages.length
+      ? await client.from("product_images").insert(
+          uploadedImages.map((path) => ({
+            product_id: productData.id,
+            path,
+          }))
+        )
+      : { error: null };
 
     if (imagesError) throw imagesError;
 

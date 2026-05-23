@@ -1,12 +1,20 @@
 <template>
   <div class="bg-white rounded-xl shadow-sm overflow-hidden group">
     <!-- Category Image -->
-    <div class="aspect-[4/3] relative overflow-hidden">
-      <img 
-        :src="image" 
-        :alt="name"
-        class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
-      />
+    <div class="aspect-[4/3] relative overflow-hidden bg-slate-50 flex items-center justify-center">
+      <template v-if="image">
+        <img 
+          :src="image" 
+          :alt="name"
+          class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
+        />
+      </template>
+      <template v-else>
+        <div class="flex flex-col items-center justify-center p-6 text-slate-400">
+          <Icon name="i-uil-apps" class="w-12 h-12" />
+          <p class="text-sm mt-2">No image</p>
+        </div>
+      </template>
       <!-- Actions Overlay -->
       <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
         <button
@@ -43,7 +51,7 @@
 interface Props {
   id: number
   name: string
-  image: string
+  image?: string | null
   created_at: string
   products_count?: number
 }
