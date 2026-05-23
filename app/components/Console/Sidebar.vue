@@ -2,11 +2,10 @@
   <div>
     <aside
       :class="[
-        'fixed left-0 top-0 h-screen bg-white border-r border-slate-200 flex flex-col z-30 transition-all duration-300',
-        'md:fixed',
+        'fixed inset-y-0 left-0 z-30 flex h-screen flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out',
         sidebarStore.sidebarWidth,
-        { '-translate-x-full': !sidebarStore.isMobileOpen && isMobile },
-        { 'translate-x-0': sidebarStore.isMobileOpen || !isMobile },
+        { '-translate-x-full md:translate-x-0': !sidebarStore.isMobileOpen },
+        { 'translate-x-0': sidebarStore.isMobileOpen },
       ]"
     >
       <!-- Logo Section -->
@@ -174,8 +173,8 @@
           :class="{ 'justify-center': sidebarStore.isCollapsed }"
         >
           <img
-            :src="`https://ui-avatars.com/api/?name=${authStore.name}&background=10B981&color=fff`"
-            :alt="authStore.name"
+            :src="`https://ui-avatars.com/api/?name=${authStore.name || 'User'}&background=10B981&color=fff`"
+            :alt="authStore.name || 'User'"
             class="w-8 h-8 rounded-full"
           />
           <div v-if="!sidebarStore.isCollapsed" class="flex-1 min-w-0 ml-3">
@@ -234,15 +233,35 @@ nav::-webkit-scrollbar {
 }
 </style>
 
-<script setup>
-import { ref, computed } from "vue";
+<script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
 
 const sidebarStore = useSidebarStore();
-const authStore = useAuthStore(); // Add auth store
+const authStore = useAuthStore();
 const route = useRoute();
+const supabase = useSupabaseClient();
 
-const isMobile = ref(false);
-const isClient = computed(() => process.client);
+const totalProductsCount = ref<number | null>(null);
+const pendingInquiriesCount = ref<number | null>(null);
+
+const loadSidebarCounts = async () => {
+  const [{ count: productsCount }, { count: inquiriesCount }] = await Promise.all([
+    supabase.from("products").select("*", { count: "exact", head: true }),
+    supabase
+      .from("inquiry_status")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "Pending"),
+  ]);
+
+  totalProductsCount.value = productsCount ?? 0;
+  pendingInquiriesCount.value = inquiriesCount ?? 0;
+};
+
+onMounted(() => {
+  loadSidebarCounts().catch((error) => {
+    console.error("Error loading sidebar product count:", error);
+  });
+});
 
 // Define navigation items with role requirements
 const mainNavLinks = computed(() => [
@@ -256,7 +275,7 @@ const mainNavLinks = computed(() => [
     name: "Products",
     path: "/console/products",
     icon: "i-uil-box",
-    badge: "24",
+    badge: totalProductsCount.value === null ? "" : String(totalProductsCount.value),
     roles: ["Admin", "Moderator"],
   },
   {
@@ -272,7 +291,10 @@ const otherLinks = computed(() => [
     name: "Inquiries",
     path: "/console/inquiries",
     icon: "i-uil-comment-message",
-    badge: "12",
+    badge:
+      pendingInquiriesCount.value === null
+        ? ""
+        : String(pendingInquiriesCount.value),
     roles: ["Admin", "Moderator"], // Both roles can access
   },
 ]);
@@ -300,15 +322,15 @@ const accountLinks = computed(() => [
 
 // Filter links based on user role
 const filteredMainNavLinks = computed(() =>
-  mainNavLinks.value.filter((link) => link.roles.includes(authStore.role))
+  mainNavLinks.value.filter((link) => authStore.role && link.roles.includes(authStore.role))
 );
 
 const filteredOtherLinks = computed(() =>
-  otherLinks.value.filter((link) => link.roles.includes(authStore.role))
+  otherLinks.value.filter((link) => authStore.role && link.roles.includes(authStore.role))
 );
 
 const filteredAccountLinks = computed(() =>
-  accountLinks.value.filter((link) => link.roles.includes(authStore.role))
+  accountLinks.value.filter((link) => authStore.role && link.roles.includes(authStore.role))
 );
 
 const logout = async () => {
@@ -319,7 +341,7 @@ const logout = async () => {
   navigateTo("/auth/sign-in");
 }
 
-const isLinkActive = (path) => {
+const isLinkActive = (path: string): boolean => {
   if (path === "/console") {
     return route.path === path;
   }

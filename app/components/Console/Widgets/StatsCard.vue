@@ -34,12 +34,12 @@ defineProps({
     required: true,
   },
   value: {
-    type: String,
+    type: [String, Number],
     required: true,
   },
   trend: {
     type: Number,
-    required: true,
+    default: 0,
   },
   iconBgClass: {
     type: String,

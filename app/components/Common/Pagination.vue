@@ -1,29 +1,30 @@
 <!-- Simple pagination component -->
 <template>
-  <div class="flex items-center justify-center gap-2">
+  <div class="flex w-full flex-wrap items-center justify-center gap-2 sm:flex-nowrap">
     <!-- Previous button -->
     <button
       @click="$emit('update:currentPage', currentPage - 1)"
       :disabled="currentPage === 1"
-      class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 sm:h-10 sm:w-10"
     >
-      <Icon name="i-uil-angle-left" class="w-5 h-5" />
+      <Icon name="i-uil-angle-left" class="h-4 w-4 sm:h-5 sm:w-5" />
     </button>
 
     <!-- Page numbers -->
-    <div class="flex items-center gap-2">
+    <div class="flex max-w-full items-center gap-1 overflow-x-auto px-1 sm:gap-2 sm:overflow-visible sm:px-0">
       <button
         v-for="page in displayedPages"
         :key="page"
         @click="$emit('update:currentPage', page)"
         :class="[
-          'inline-flex items-center justify-center w-10 h-10 rounded-lg border text-sm font-medium',
+          'inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border text-xs font-medium sm:h-10 sm:w-10 sm:text-sm',
           currentPage === page
             ? 'border-emerald-500 bg-emerald-50 text-emerald-600'
             : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
         ]"
       >
-        {{ page }}
+        <span v-if="page !== -1">{{ page }}</span>
+        <span v-else class="text-slate-400">...</span>
       </button>
     </div>
 
@@ -31,9 +32,9 @@
     <button
       @click="$emit('update:currentPage', currentPage + 1)"
       :disabled="currentPage === totalPages"
-      class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 sm:h-10 sm:w-10"
     >
-      <Icon name="i-uil-angle-right" class="w-5 h-5" />
+      <Icon name="i-uil-angle-right" class="h-4 w-4 sm:h-5 sm:w-5" />
     </button>
   </div>
 </template>

@@ -90,6 +90,9 @@ const config = useRuntimeConfig()
 
 const getImageUrl = (path: string | null): string | undefined => {
   if (!path) return undefined
+  if (path.startsWith('/') || path.startsWith('http://') || path.startsWith('https://')) {
+    return path
+  }
   return `${config.public.supabase.url}/storage/v1/object/public/product_images/${path}`
 }
 
