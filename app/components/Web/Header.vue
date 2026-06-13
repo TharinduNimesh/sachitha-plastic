@@ -123,6 +123,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 const navigationLinks = [
   { name: "Home", path: "/" },
   { name: "Products", path: "/products" },
+  { name: "Categories", path: "/categories" },
   { name: "Services", path: "/services" },
   { name: "About", path: "/about" },
 ];
