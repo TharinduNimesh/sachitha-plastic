@@ -2,7 +2,6 @@
   <NuxtLayout name="web">
     <WebHero />
     <WebAbout />
-    <WebProductShowcase />
     <WebCategorySlider />
     <WebCallToAction />
     <WebProducts />
