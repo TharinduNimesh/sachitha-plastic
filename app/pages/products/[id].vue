@@ -30,20 +30,25 @@
           <!-- Product Images -->
           <div class="my-12">
             <!-- Image Slider -->
-            <div class="relative aspect-[3/2] rounded-2xl overflow-hidden bg-slate-100">
+            <div class="relative aspect-[3/2] rounded-2xl overflow-hidden bg-slate-100 group cursor-pointer" @click="isFullScreen = true">
               <img v-if="allImages.length > 0" :src="getImageUrl(allImages[currentImageIndex] ?? '')"
-                :alt="product.name" class="w-full h-full object-cover" />
+                :alt="product.name" class="w-full h-full object-contain p-4 mix-blend-multiply transition-all duration-300" />
               <div v-else class="w-full h-full flex items-center justify-center text-slate-400">
                 <Icon name="heroicons:photo" class="w-12 h-12" />
               </div>
 
+              <!-- Expand icon -->
+              <div v-if="allImages.length > 0" class="absolute top-4 right-4 bg-white/80 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                <Icon name="heroicons:arrows-pointing-out" class="w-5 h-5 text-slate-700" />
+              </div>
+
               <!-- Navigation Buttons -->
               <template v-if="allImages.length > 1">
-                <button @click="prevImage"
+                <button @click.stop="prevImage"
                   class="w-12 h-12 flex justify-center items-center absolute left-2 top-1/2 transform -translate-y-1/2 rounded-full bg-white/80 hover:bg-white transition-colors duration-300">
                   <Icon name="heroicons:chevron-left" class="w-6 h-6 text-slate-600" />
                 </button>
-                <button @click="nextImage"
+                <button @click.stop="nextImage"
                   class="w-12 h-12 flex justify-center items-center absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-white/80 hover:bg-white transition-colors duration-300">
                   <Icon name="heroicons:chevron-right" class="w-6 h-6 text-slate-600" />
                 </button>
@@ -53,10 +58,10 @@
             <!-- Thumbnail Grid -->
             <div v-if="allImages.length > 1" class="grid grid-cols-6 gap-4 mt-4">
               <button v-for="(image, index) in allImages" :key="index" @click="currentImageIndex = index"
-                class="aspect-square rounded-lg overflow-hidden bg-slate-100 relative" :class="currentImageIndex === index ? 'ring-2 ring-emerald-500' : ''
+                class="aspect-square rounded-lg overflow-hidden bg-slate-100 relative p-1" :class="currentImageIndex === index ? 'ring-2 ring-emerald-500' : ''
                   ">
                 <img :src="getImageUrl(image)" :alt="`${product.name} - Image ${index + 1}`"
-                  class="w-full h-full object-cover" />
+                  class="w-full h-full object-contain mix-blend-multiply transition-all duration-300" />
               </button>
             </div>
           </div>
@@ -137,6 +142,28 @@
     <div v-else class="pt-32 pb-16 text-center">
       <WebProductNotfound />
     </div>
+
+    <!-- Full Screen Image Modal -->
+    <Teleport to="body">
+      <div v-if="isFullScreen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-50/80 backdrop-blur-xl p-4 sm:p-12 transition-all duration-500" @click.self="isFullScreen = false">
+        <button @click="isFullScreen = false" class="absolute top-6 right-6 flex items-center justify-center w-12 h-12 bg-white text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-full shadow-sm hover:shadow-md transition-all duration-300 z-10 border border-slate-100">
+          <Icon name="heroicons:x-mark" class="w-6 h-6" />
+        </button>
+        
+        <div class="relative w-full h-full max-w-6xl max-h-[85vh] flex items-center justify-center" @click.self="isFullScreen = false">
+          <img :src="getImageUrl(allImages[currentImageIndex] ?? '')" :alt="product.name" class="max-w-full max-h-full object-contain filter drop-shadow-2xl rounded-lg mix-blend-multiply transition-all duration-300" />
+          
+          <template v-if="allImages.length > 1">
+            <button @click.stop="prevImage" class="absolute -left-2 md:-left-8 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-white text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-full shadow-md hover:shadow-lg transition-all duration-300 z-10 border border-slate-100">
+              <Icon name="heroicons:chevron-left" class="w-6 h-6 sm:w-7 sm:h-7" />
+            </button>
+            <button @click.stop="nextImage" class="absolute -right-2 md:-right-8 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-white text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-full shadow-md hover:shadow-lg transition-all duration-300 z-10 border border-slate-100">
+              <Icon name="heroicons:chevron-right" class="w-6 h-6 sm:w-7 sm:h-7" />
+            </button>
+          </template>
+        </div>
+      </div>
+    </Teleport>
   </NuxtLayout>
 </template>
 
@@ -153,6 +180,7 @@ const loading = ref(true);
 const product = ref<Product | null>(null);
 const similarProducts = ref<Product[]>([]);
 const currentImageIndex = ref(0);
+const isFullScreen = ref(false);
 const route = useRoute();
 const config = useRuntimeConfig();
 

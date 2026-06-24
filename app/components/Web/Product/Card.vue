@@ -5,12 +5,12 @@
     class="group block bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300"
   >
     <!-- Product Image with consistent aspect ratio -->
-    <div class="relative aspect-square overflow-hidden bg-slate-100">
+    <div class="relative aspect-square overflow-hidden bg-slate-100 p-4">
       <img
         v-if="product.primary_image"
         :src="getImageUrl(product.primary_image)"
         :alt="product.name"
-        class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+        class="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
         loading="lazy"
       />
       <div v-else class="w-full h-full flex items-center justify-center text-slate-400">
