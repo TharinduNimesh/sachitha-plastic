@@ -30,9 +30,9 @@
           <!-- Product Images -->
           <div class="my-12">
             <!-- Image Slider -->
-            <div class="relative aspect-[3/2] rounded-2xl overflow-hidden bg-slate-100 group cursor-pointer" @click="isFullScreen = true">
+            <div class="relative rounded-2xl overflow-hidden bg-slate-100 group cursor-pointer w-full flex items-center justify-center min-h-[300px]" @click="isFullScreen = true">
               <img v-if="allImages.length > 0" :src="getImageUrl(allImages[currentImageIndex] ?? '')"
-                :alt="product.name" class="w-full h-full object-contain p-4 mix-blend-multiply transition-all duration-300" />
+                :alt="product.name" class="w-full h-auto object-contain p-4 mix-blend-multiply transition-all duration-300" />
               <div v-else class="w-full h-full flex items-center justify-center text-slate-400">
                 <Icon name="heroicons:photo" class="w-12 h-12" />
               </div>
